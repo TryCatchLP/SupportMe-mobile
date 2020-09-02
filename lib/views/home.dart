@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supportme/theme/theme.dart';
+import 'package:supportme/views/Rating.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -9,17 +9,28 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _bottomNavigationIndex = 0;
 
-  _onItemTap(int index) {
-    setState(() {
+  _onItemTap(int index){
+    setState((){
       _bottomNavigationIndex = index;
     });
+    switch (index) {
+      case 1:
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => Rating()));
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.gps_fixed, color: Color(0xFF59A5BD),),
+        child: Icon(
+          Icons.gps_fixed,
+          color: Color(0xFF59A5BD),
+        ),
         onPressed: () => {},
       ),
       bottomNavigationBar: BottomMenu(
