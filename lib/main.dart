@@ -15,6 +15,7 @@ class SupportMe extends StatelessWidget {
       title: 'SupportMe',
       theme: ThemeData(
         primarySwatch: AppTheme.pallete,
+        appBarTheme: AppTheme.appBarTheme,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Main(),
