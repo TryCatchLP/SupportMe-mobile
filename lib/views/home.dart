@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supportme/views/Rating.dart';
+import 'package:supportme/views/hueca.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -26,6 +27,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: Hueca(),
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.gps_fixed,
@@ -62,7 +64,8 @@ class BottomMenu extends StatelessWidget {
               icon: Icon(Icons.home), title: Text("Inicio")),
           BottomNavigationBarItem(
               icon: Icon(Icons.search), title: Text("Buscar")),
-          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Nuevo")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add), title: Text("Nuevo")),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text("Perfil"))
         ]);
