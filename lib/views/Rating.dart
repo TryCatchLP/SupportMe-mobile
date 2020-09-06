@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:supportme/models/rating.dart';
+import 'package:supportme/services/rating_service.dart';
 import 'package:supportme/theme/theme.dart';
 
-class Rating extends StatefulWidget {
+class RatingView extends StatefulWidget {
   @override
-  _RatingState createState() => _RatingState();
+  _RatingViewState createState() => _RatingViewState();
 }
 
-class _RatingState extends State<Rating> {
+class _RatingViewState extends State<RatingView> {
+  int rating = 0;
+  TextEditingController comment = TextEditingController();
+
   _onCalificate(int calification) {
-    print(calification);
+    rating = calification;
+  }
+
+  _submit() async {
+    Rating rating = Rating(
+        comentario: comment.text, huecaid: 1, stars: this.rating, userid: 1);
+    showDialog(
+        context: context,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ));
+    await RaatingService.post(rating);
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   @override
@@ -30,7 +48,7 @@ class _RatingState extends State<Rating> {
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),
-              child: TextArea(),
+              child: TextArea(controller: comment,),
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),
@@ -38,7 +56,7 @@ class _RatingState extends State<Rating> {
                 width: double.infinity,
                 height: 40,
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: _submit,
                   child: Text("ENVIAR"),
                   color: AppTheme.pallete.shade600,
                 ),
@@ -52,9 +70,9 @@ class _RatingState extends State<Rating> {
 }
 
 class TextArea extends StatelessWidget {
-  const TextArea({
-    Key key,
-  }) : super(key: key);
+  const TextArea({Key key, this.controller}) : super(key: key);
+
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +81,7 @@ class TextArea extends StatelessWidget {
       color: AppTheme.pallete.shade200,
       child: TextField(
         maxLines: 5,
-        controller: TextEditingController(),
+        controller: controller,
         decoration: InputDecoration(
             hintText: "Deja tu comentario",
             border: OutlineInputBorder(

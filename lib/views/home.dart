@@ -17,7 +17,7 @@ class _HomeState extends State<Home> {
     switch (index) {
       case 1:
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => Rating()));
+            .push(MaterialPageRoute(builder: (context) => RatingView()));
         break;
       default:
         break;
