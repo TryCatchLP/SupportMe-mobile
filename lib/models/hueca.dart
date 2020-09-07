@@ -37,7 +37,6 @@ class Hueca {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
         "name": name,
         "descrip": descrip,
         "lat": lat,
