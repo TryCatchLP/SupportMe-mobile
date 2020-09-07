@@ -4,12 +4,12 @@
 
 import 'package:flutter/material.dart';
 
-void main() {
+//void main() {
   
-  runApp(MyApp());
-}
+  //runApp(BuscarView());
+//}
 
-class MyApp extends StatelessWidget {
+class BuscarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
