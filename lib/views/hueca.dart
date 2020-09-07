@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:supportme/theme/theme.dart';
+import 'package:supportme/views/menu.dart';
 
-class Hueca extends StatefulWidget {
+class HuecaView extends StatefulWidget {
   @override
-  _HuecaState createState() => _HuecaState();
+  _HuecaViewState createState() => _HuecaViewState();
 }
 
-class _HuecaState extends State<Hueca> {
+class _HuecaViewState extends State<HuecaView> {
   final _formKey = GlobalKey<FormState>();
-  bool soy_dueno = false;
+  bool _soydueno = false;
   //with SingleTickerProviderStateMixin {
   //AnimationController _controller;
 
@@ -26,115 +28,114 @@ class _HuecaState extends State<Hueca> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Registrar Hueca'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(40.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            TextFormField(
-              decoration: const InputDecoration(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              CustomField(
                 hintText: 'Nombre',
-                labelText: 'Nombre*',
-                suffixIcon: Icon(Icons.person_outline),
+                icon: Icons.person_outline,
               ),
-              autofocus: true,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Por favor ingrese un nombre';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
+              CustomField(
                 hintText: 'Dirección',
-                labelText: 'Dirección*',
-                suffixIcon: Icon(Icons.pin_drop),
+                icon: Icons.pin_drop,
               ),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Por favor ingrese una dirección';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: 'Longitude',
-                    labelText: 'Longitude',
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese una dirección';
-                    }
-                    return null;
-                  },
-                ),
-            TextFormField(
-                  decoration: const InputDecoration(
+              Row(children: [
+                Expanded(
+                  child: CustomField(
                     hintText: 'Latitude',
-                    labelText: 'Latitude',
                   ),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Por favor ingrese una dirección';
-                    }
-                    return null;
-                  },
                 ),
-            TextFormField(
-              decoration: const InputDecoration(
+                Container(
+                  width: 10.0,
+                ),
+                Expanded(
+                  child: CustomField(
+                    hintText: 'Longitud',
+                  ),
+                ),
+              ]),
+              CustomField(
                 hintText: 'Phone',
-                labelText: 'Phone',
-                suffixIcon: Icon(Icons.phone),
+                icon: Icons.phone,
               ),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Por favor ingrese una dirección';
-                }
-                return null;
-              },
-            ),           
-
-            Card(
-              color: Colors.grey[350],
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: TextField(
-                  maxLines: 4,
-                  decoration: InputDecoration.collapsed(hintText: "Descripción"),
-                ),
-              )
-            ),
-
-           Row(
+              SizedBox(height: 15.0),
+              Card(
+                  color: Colors.grey[350],
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: TextField(
+                      maxLines: 4,
+                      decoration:
+                          InputDecoration.collapsed(hintText: "Descripción"),
+                    ),
+                  )),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Checkbox(
-                    value: soy_dueno,
+                    value: _soydueno,
                     onChanged: (bool value) {
                       setState(() {
-                        soy_dueno = value;
+                        _soydueno = value;
                       });
                     },
                   ),
                   Text("SOY DUEÑO"),
                 ],
               ),
-
-            RaisedButton(
-              onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  // Process data.
-                }
-              },
-              child: Text('SIGUIENTE'),
-            ),
-          ],
+              SizedBox(height: 15.0),
+              RaisedButton(
+                color: AppTheme.primary,
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    // Process data.
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Menu()));
+                  }
+                },
+                child: Text('SIGUIENTE'),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class CustomField extends StatelessWidget {
+  final String hintText;
+  final String labelText;
+  final IconData icon;
+
+  CustomField({
+    Key key,
+    this.hintText,
+    this.labelText,
+    this.icon,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(
+        hintText: hintText,
+        labelText: labelText ?? hintText,
+        suffixIcon: Icon(icon),
+      ),
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Por favor ingrese su $hintText';
+        }
+        return null;
+      },
     );
   }
 }

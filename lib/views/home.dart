@@ -9,15 +9,31 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _bottomNavigationIndex = 0;
+  Widget _widget;
 
-  _onItemTap(int index){
-    setState((){
+  @override
+  void initState() {
+    _widget = SafeArea(child: Text('Principal'));
+    super.initState();
+  }
+
+  _onItemTap(int index) {
+    setState(() {
       _bottomNavigationIndex = index;
     });
     switch (index) {
+      case 0:
+        setState(() {
+          _widget = SafeArea(child: Text('Principal'));
+        });
+        break;
       case 1:
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => RatingView()));
+        break;
+      case 2:
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => HuecaView()));
         break;
       default:
         break;
@@ -27,7 +43,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Hueca(),
+      body: _widget,
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.gps_fixed,
@@ -64,8 +80,7 @@ class BottomMenu extends StatelessWidget {
               icon: Icon(Icons.home), title: Text("Inicio")),
           BottomNavigationBarItem(
               icon: Icon(Icons.search), title: Text("Buscar")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add), title: Text("Nuevo")),
+          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Nuevo")),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text("Perfil"))
         ]);
