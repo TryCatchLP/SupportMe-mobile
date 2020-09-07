@@ -25,9 +25,11 @@ class _RatingViewState extends State<RatingView> {
         child: Center(
           child: CircularProgressIndicator(),
         ));
-    await RaatingService.post(rating);
-    Navigator.pop(context);
-    Navigator.pop(context);
+    final res = await RaatingService.post(rating);
+    if(res != null){
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
 
   @override
