@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supportme/views/Rating.dart';
 import 'package:supportme/views/hueca.dart';
 import 'package:supportme/views/map_view.dart';
+import  'buscar.dart';
 
 class Home extends StatefulWidget {
   @override
