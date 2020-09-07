@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 
 class RaatingService {
@@ -9,7 +10,8 @@ class RaatingService {
     try {
       final response = await _dio.post("/ratings", data: rating.toJson());
       return response.data;
-    } catch (_) {
+    } on DioError catch (ex) {
+      print(ex.response.data);
       return null;
     }
   }

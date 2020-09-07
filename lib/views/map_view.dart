@@ -5,7 +5,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:supportme/models/hueca.dart';
+import 'package:supportme/services/hueca_service.dart';
+import 'package:supportme/services/rating_service.dart';
+import 'package:supportme/theme/theme.dart';
 
 import 'Rating.dart';
 
@@ -18,9 +22,12 @@ class _MapViewState extends State<MapView> {
   Completer<GoogleMapController> _controller = Completer();
   Map<MarkerId, Marker> markers = Map<MarkerId, Marker>();
   GlobalKey<ScaffoldState> _scaff = GlobalKey<ScaffoldState>();
+  PanelController panelController = PanelController();
+  Hueca hueca;
 
   @override
   void dispose() {
+    hueca = null;
     _controller.future.then((value) => value.dispose());
     super.dispose();
   }
@@ -31,7 +38,7 @@ class _MapViewState extends State<MapView> {
   );
 
   Future<void> _localice() async {
-    final GoogleMapController controller = await _controller.future;
+    //final GoogleMapController controller = await _controller.future;
 
     //controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
@@ -61,20 +68,22 @@ class _MapViewState extends State<MapView> {
   _addMarkers(List<Hueca> huecas) async {
     final Uint8List markerIcon =
         await getBytesFromAsset("assets/images/logo.png", 100);
-    for (Hueca hueca in huecas) {
-      MarkerId markerId = MarkerId("${hueca.id}");
-      Marker marker = Marker(
-          markerId: markerId,
-          onTap: () => {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => RatingView(
-                          huecaid: hueca.id,
-                        )))
-              },
-          position: LatLng(hueca.lat, hueca.lng),
-          icon: BitmapDescriptor.fromBytes(markerIcon));
-      markers[markerId] = marker;
-    }
+    setState(() {
+      for (Hueca hueca in huecas) {
+        MarkerId markerId = MarkerId("${hueca.id}");
+        Marker marker = Marker(
+            markerId: markerId,
+            onTap: () {
+              setState(() {
+                this.hueca = hueca;
+              });
+              panelController.open();
+            },
+            position: LatLng(hueca.lat, hueca.lng),
+            icon: BitmapDescriptor.fromBytes(markerIcon));
+        markers[markerId] = marker;
+      }
+    });
   }
 
   _zoomMap(LatLng latLng) async {
@@ -108,20 +117,36 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       key: _scaff,
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _ec,
-        zoomControlsEnabled: false,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        zoomGesturesEnabled: true,
-        onLongPress: _showOptions,
-        markers: markers.values.toSet(),
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+      body: SlidingUpPanel(
+        controller: panelController,
+        collapsed: Icon(
+          Icons.keyboard_arrow_down,
+          color: Colors.white,
+        ),
+        backdropEnabled: true,
+        minHeight: 0.0,
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+        panel: Panel(
+          hueca: hueca,
+        ),
+        body: GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: _ec,
+          zoomControlsEnabled: false,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          zoomGesturesEnabled: true,
+          onLongPress: _showOptions,
+          markers: markers.values.toSet(),
+          onMapCreated: (GoogleMapController controller) async {
+            _controller.complete(controller);
+            _addMarkers(await HuecaService.getHuecas());
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -129,6 +154,61 @@ class _MapViewState extends State<MapView> {
           color: Color(0xFF59A5BD),
         ),
         onPressed: _localice,
+      ),
+    );
+  }
+}
+
+class Panel extends StatefulWidget {
+  final Hueca hueca;
+  const Panel({Key key, this.hueca}) : super(key: key);
+
+  @override
+  _PanelState createState() => _PanelState();
+}
+
+class _PanelState extends State<Panel> {
+  String _getStars() {
+    if (widget.hueca.ratings != 0) {
+      return (widget.hueca.stars / widget.hueca.ratings).toStringAsFixed(1);
+    }
+    return "0.0";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Nombre: ${widget.hueca?.name ?? ''} "),
+                Text("Descripción: ${widget.hueca?.descrip ?? ''}"),
+                Text("Dirección: ${widget.hueca?.address ?? ''}"),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("${_getStars()}"),
+                Icon(Icons.star, size: 16,),
+                Text("(${widget.hueca.ratings})")
+              ],
+            ),
+            RaisedButton(
+                child: Text("Calificar"),
+                onPressed: () => {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => RatingView(
+                                hueca: widget.hueca,
+                              )))
+                    })
+          ],
+        ),
       ),
     );
   }

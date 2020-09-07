@@ -14,4 +14,18 @@ class HuecaService {
       return null;
     }
   }
+
+  static Future<List<Hueca>> getHuecas() async {
+    try {
+      final response = await _dio.get("/huecas");
+      List<Hueca> res = List<Hueca>();
+      for (var dat in response.data) {
+        res.add(Hueca.fromJson(dat));
+      }
+      return res;
+    } catch (_) {
+      return null;
+    }
+  }
+
 }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 import 'package:supportme/services/rating_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 class RatingView extends StatefulWidget {
-  final int huecaid;
+  final Hueca hueca;
 
-  const RatingView({Key key, this.huecaid}) : super(key: key);
+  const RatingView({Key key, this.hueca}) : super(key: key);
 
   @override
   _RatingViewState createState() => _RatingViewState();
@@ -23,8 +24,8 @@ class _RatingViewState extends State<RatingView> {
 
   _submit() async {
     Rating rating = Rating(
-        comentario: comment.text,
-        huecaid: widget.huecaid,
+        comentario: comment.text.isEmpty ? "<no comment>" : comment.text,
+        huecaid: widget.hueca.id,
         stars: this.rating,
         userid: 1);
     showDialog(
@@ -49,11 +50,19 @@ class _RatingViewState extends State<RatingView> {
         child: ListView(
           shrinkWrap: true,
           children: [
+            Center(
+                child: Text(
+              "${widget.hueca.name}",
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            )),
+            SizedBox(
+              height: 15,
+            ),
             RatingStar(
               onCalificate: _onCalificate,
             ),
             SizedBox(
-              height: 20,
+              height: 15,
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),

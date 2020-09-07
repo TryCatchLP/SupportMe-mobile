@@ -12,7 +12,7 @@ class Rating {
       "stars": this.stars,
       "user_id": this.userid,
       "hueca_id": this.huecaid,
-      "comentario": this.comentario,
+      "comentario": this.comentario ?? '<no comment>',
     };
   }
 
