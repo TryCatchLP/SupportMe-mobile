@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supportme/views/Rating.dart';
 import 'package:supportme/views/hueca.dart';
+import 'package:supportme/views/map_view.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,18 +14,19 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    _widget = SafeArea(child: Text('Principal'));
+    _widget = MapView();
     super.initState();
   }
 
   _onItemTap(int index) {
     setState(() {
-      _bottomNavigationIndex = index;
+      if(index == 0 || index == 3)
+        _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:
         setState(() {
-          _widget = SafeArea(child: Text('Principal'));
+          _widget = MapView();
         });
         break;
       case 1:
@@ -44,13 +46,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _widget,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.gps_fixed,
-          color: Color(0xFF59A5BD),
-        ),
-        onPressed: () => {},
-      ),
       bottomNavigationBar: BottomMenu(
         bottomNavigationIndex: _bottomNavigationIndex,
         onItemTap: _onItemTap,

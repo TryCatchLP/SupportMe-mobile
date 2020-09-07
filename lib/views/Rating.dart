@@ -5,6 +5,10 @@ import 'package:supportme/services/rating_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 class RatingView extends StatefulWidget {
+  final int huecaid;
+
+  const RatingView({Key key, this.huecaid}) : super(key: key);
+
   @override
   _RatingViewState createState() => _RatingViewState();
 }
@@ -19,14 +23,17 @@ class _RatingViewState extends State<RatingView> {
 
   _submit() async {
     Rating rating = Rating(
-        comentario: comment.text, huecaid: 1, stars: this.rating, userid: 1);
+        comentario: comment.text,
+        huecaid: widget.huecaid,
+        stars: this.rating,
+        userid: 1);
     showDialog(
         context: context,
         child: Center(
           child: CircularProgressIndicator(),
         ));
     final res = await RaatingService.post(rating);
-    if(res != null){
+    if (res != null) {
       Navigator.pop(context);
       Navigator.pop(context);
     }
@@ -50,7 +57,9 @@ class _RatingViewState extends State<RatingView> {
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),
-              child: TextArea(controller: comment,),
+              child: TextArea(
+                controller: comment,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(40.0),
