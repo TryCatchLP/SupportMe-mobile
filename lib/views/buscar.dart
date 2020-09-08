@@ -3,13 +3,11 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-
-//void main() {
-  
-  //runApp(BuscarView());
-//}
+import 'package:supportme/models/hueca.dart';
+import 'package:supportme/services/hueca_service.dart';
 
 class BuscarView extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,6 +32,16 @@ class Buscar extends StatefulWidget {
 }
 
 class _HomePageState extends State<Buscar> {
+  List<Hueca> huecas= List();
+  @override
+  void initState(){
+    HuecaService.getHuecas().then((List<Hueca> values){
+      setState((){
+        huecas=values;
+      });
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,8 +60,10 @@ class _HomePageState extends State<Buscar> {
         backgroundColor: Colors.white,
         elevation: 0.7,    
       ),
-      body: vista(),
-      bottomNavigationBar: BottomNavigationBar(
+      body: new ListView.builder(
+        itemBuilder: _builder,
+        itemCount: huecas.length,),
+        bottomNavigationBar: BottomNavigationBar(
         
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
@@ -72,6 +82,35 @@ class _HomePageState extends State<Buscar> {
      
   }
 }
+//Widget vista2() {
+  //return ListView.builder(
+    //itemBuilder: _builder,
+    //itemCount: huecas.length,);
+//}
+Widget _builder(context, i){
+  return Container(
+             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20),
+             decoration:BoxDecoration(
+               color: Color(0xFFF1D57F),
+              border: Border.all(color: Color(0xFFF1D57F),width: 1.0,),
+              ),
+            
+            child:Row(
+              children:  <Widget>[
+                SizedBox(height: 25.0),
+                SizedBox(width: 12.0), 
+                Image.network(
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU", 
+                  width: 70),
+                SizedBox(width: 10.0),
+                Text(
+                  "${huecas[i].name}\n${huecas[i].descrip}\nAbierto\nLunes-Viernes: 07:30-16:00\nSï¿½bado: 8:00-15:00", 
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
+              ]
+            )
+          );
+}
+
 Widget vista() {
      return Container(
       child: Column(
@@ -118,7 +157,7 @@ Widget vista() {
                 SizedBox(width: 12.0), 
                 Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU", width: 70),
                 SizedBox(width: 10.0),
-                Text("Hueca 1\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSábado: 8:00-15:00", style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
+                Text("Hueca 1\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSï¿½bado: 8:00-15:00", style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
               ]
             )
           ),
@@ -138,7 +177,7 @@ Widget vista() {
                 SizedBox(width: 12.0), 
                Image.network("https://res.cloudinary.com/civico/image/upload/c_fit,f_auto,fl_lossy,h_1200,q_auto:low,w_1200/v1517429789/entity/image/file/107/000/5a72241c658d1de180000107.jpg", width: 70),
                 SizedBox(width: 10.0),
-                Text("Hueca 2\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSábado: 8:00-15:00", style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
+                Text("Hueca 2\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSï¿½bado: 8:00-15:00", style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
               ]
             )
           ),
@@ -157,7 +196,7 @@ Widget vista() {
                 SizedBox(width: 12.0), 
                 Image.network("https://www.eluniverso.com/sites/default/files/styles/powgallery_1024/public/fotos/2018/07/data252280170000.jpg?itok=uRt2CnLI", width: 70),
                 SizedBox(width: 10.0),
-                Text("Hueca 3\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSábado: 8:00-15:00",style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
+                Text("Hueca 3\nRestaurante\nAbierto\nLunes-Viernes: 07:30-16:00\nSï¿½bado: 8:00-15:00",style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
               ]
             )
           ),
