@@ -86,10 +86,13 @@ class _HomePageState extends State<Buscar> {
               ]
             )
           ),
-        ListView.builder(
-        itemBuilder: _builder,
-        itemCount: huecas.length,),
-         ]),),
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: _builder,
+              itemCount: huecas.length,),
+          )
+        ]),
+        ),
         bottomNavigationBar: BottomNavigationBar(
         
         selectedItemColor: Colors.black,
@@ -106,7 +109,7 @@ class _HomePageState extends State<Buscar> {
         ],
         ),
     );
-    
+     
   }
   Widget _builder(context, i){
   return Container(
@@ -131,13 +134,38 @@ class _HomePageState extends State<Buscar> {
             )
           );
 }
+Widget vista() {
+     return Container(
+      child: Column(
+         children: <Widget>[
+           Container(
+            child:Row(
+              children:  <Widget>[
+                SizedBox(height: 40.0),
+                SizedBox(width: 20.0),
+                Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQCwoP17v-18qx6u_le4xC0Njb98HbCJ5ZT6w&usqp=CAU", width: 15),
+                SizedBox(width: 10.0),
+                Text("Filtrar", style: TextStyle(fontWeight: FontWeight.bold)),
+              ]
+            )
+          ),
+        Container(
+          margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10),
+          decoration:BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.red, width: 1.0,)),
+          ),
+          
+            child:Row(
+              children:  <Widget>[
+                Text("RECOMENDACIONES", style:(TextStyle(color: Colors.red, fontSize: 15))),
+              ]
+            )
+          ),
+        ])
+      
+    );
+  }
 }
-//Widget vista2() {
-  //return ListView.builder(
-    //itemBuilder: _builder,
-    //itemCount: huecas.length,);
-//}
-
 
 class Search extends SearchDelegate {
   @override
