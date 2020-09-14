@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 
 class RaatingService {

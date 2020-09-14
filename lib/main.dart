@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supportme/auth/session.dart';
 import 'package:supportme/theme/theme.dart';
 import 'package:supportme/views/home.dart';
 import 'package:supportme/views/splash.dart';
@@ -34,6 +35,7 @@ class _MainState extends State<Main> {
   @override
   void initState() {
     _widget = Splash();
+    Session.instance.initialize();
     Future.delayed(Duration(milliseconds: 3000))
         .then((_) => setState(() => _widget = Home()));
     super.initState();

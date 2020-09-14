@@ -27,6 +27,8 @@ dependencies:
   dio: ^3.0.10
   google_maps_flutter: ^0.5.31
   sliding_up_panel: ^1.0.2
+  flutter_secure_storage: ^3.3.3
+  fluttertoast: ^7.1.1
 
 
   # The following adds the Cupertino Icons font to your application.

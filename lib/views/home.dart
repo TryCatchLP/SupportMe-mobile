@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supportme/views/Rating.dart';
+import 'package:supportme/auth/session.dart';
 import 'package:supportme/views/hueca.dart';
 import 'package:supportme/views/map_view.dart';
-import  'buscar.dart';
+import 'buscar.dart';
+import 'login.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -19,10 +20,9 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
-  _onItemTap(int index) {
+  _onItemTap(int index) async {
     setState(() {
-      if(index == 0 || index == 3)
-        _bottomNavigationIndex = index;
+      if (index == 0 || index == 3) _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:
@@ -37,6 +37,21 @@ class _HomeState extends State<Home> {
       case 2:
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => HuecaView()));
+        break;
+      case 3:
+        if (Session.instance.isAuthenticate) {
+          setState(() {
+            _widget = Container();
+          });
+        } else {
+          bool login = await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => Login()));
+          if(login ?? false){
+            setState(() {
+            _widget = Container();
+            });
+          }
+        }
         break;
       default:
         break;

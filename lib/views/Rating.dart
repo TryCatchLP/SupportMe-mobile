@@ -35,6 +35,8 @@ class _RatingViewState extends State<RatingView> {
         ));
     final res = await RaatingService.post(rating);
     if (res != null) {
+      widget.hueca.stars += this.rating;
+      widget.hueca.ratings += 1;
       Navigator.pop(context);
       Navigator.pop(context);
     }

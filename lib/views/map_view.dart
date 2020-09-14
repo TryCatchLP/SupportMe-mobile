@@ -8,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/services/hueca_service.dart';
-import 'package:supportme/services/rating_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 import 'Rating.dart';
@@ -24,12 +23,19 @@ class _MapViewState extends State<MapView> {
   GlobalKey<ScaffoldState> _scaff = GlobalKey<ScaffoldState>();
   PanelController panelController = PanelController();
   Hueca hueca;
+  LatLng _latLng;
+  bool init = true;
 
   @override
   void dispose() {
     hueca = null;
     _controller.future.then((value) => value.dispose());
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   static final CameraPosition _ec = CameraPosition(
@@ -54,36 +60,52 @@ class _MapViewState extends State<MapView> {
   }
 
   _addMarkerTmp(LatLng latLng) async {
+    init = false;
+    _scaff.currentState.hideCurrentSnackBar();
     MarkerId markerId = MarkerId("tmp");
-    Marker marker = Marker(markerId: markerId, position: latLng);
+    _latLng = latLng;
+    Marker marker = Marker(
+        markerId: markerId,
+        position: latLng,
+        draggable: true,
+        onTap: () => _showSnackBar(_latLng),
+        onDragEnd: (latLng) {
+          _latLng = latLng;
+          _scaff.currentState.hideCurrentSnackBar();
+          _showSnackBar(latLng);
+        });
     setState(() {
       markers[markerId] = marker;
     });
-    await Future.delayed(Duration(milliseconds: 4000));
+    await Future.delayed(Duration(seconds: 60));
     setState(() {
       markers.remove(markerId);
+      _scaff.currentState.hideCurrentSnackBar();
     });
   }
 
   _addMarkers(List<Hueca> huecas) async {
     final Uint8List markerIcon =
         await getBytesFromAsset("assets/images/logo.png", 100);
-    setState(() {
-      for (Hueca hueca in huecas) {
-        MarkerId markerId = MarkerId("${hueca.id}");
-        Marker marker = Marker(
-            markerId: markerId,
-            onTap: () {
-              setState(() {
-                this.hueca = hueca;
-              });
-              panelController.open();
-            },
-            position: LatLng(hueca.lat, hueca.lng),
-            icon: BitmapDescriptor.fromBytes(markerIcon));
-        markers[markerId] = marker;
-      }
-    });
+    if(this.mounted){
+      setState(() {
+        for (Hueca hueca in huecas) {
+          MarkerId markerId = MarkerId("${hueca.id}");
+          Marker marker = Marker(
+              markerId: markerId,
+              onTap: () {
+                init = false;
+                setState(() {
+                  this.hueca = hueca;
+                });
+                panelController.open();
+              },
+              position: LatLng(hueca.lat, hueca.lng),
+              icon: BitmapDescriptor.fromBytes(markerIcon));
+          markers[markerId] = marker;
+        }
+      });
+    }
   }
 
   _zoomMap(LatLng latLng) async {
@@ -92,8 +114,8 @@ class _MapViewState extends State<MapView> {
         CameraPosition(target: latLng, zoom: 18)));
   }
 
-  _showOptions(LatLng latLng) {
-    _addMarkerTmp(latLng);
+  _showSnackBar(LatLng latLng) {
+    _scaff.currentState.hideCurrentSnackBar();
     _scaff.currentState.showSnackBar(SnackBar(
         content: Column(
       mainAxisSize: MainAxisSize.min,
@@ -103,16 +125,27 @@ class _MapViewState extends State<MapView> {
           contentPadding: EdgeInsets.zero,
           leading: Icon(Icons.add),
           title: Text("Añadir hueca"),
+          onTap: () {
+            print(_latLng);
+          },
         ),
         ListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
           leading: Icon(Icons.zoom_in),
           title: Text("Acercar mapa"),
-          onTap: () => _zoomMap(latLng),
-        )
+          onTap: () async {
+            await _zoomMap(latLng);
+            _scaff.currentState.hideCurrentSnackBar();
+          },
+        ),
       ],
     )));
+  }
+
+  _showOptions(LatLng latLng) {
+    _addMarkerTmp(latLng);
+    _showSnackBar(latLng);
   }
 
   @override
@@ -121,12 +154,20 @@ class _MapViewState extends State<MapView> {
       key: _scaff,
       body: SlidingUpPanel(
         controller: panelController,
-        collapsed: Icon(
-          Icons.keyboard_arrow_down,
-          color: Colors.white,
+        header: GestureDetector(
+          onTap: () => panelController.close(),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            child: Icon(
+              Icons.keyboard_arrow_down,
+              color: Colors.white,
+            ),
+          ),
         ),
         backdropEnabled: true,
         minHeight: 0.0,
+        onPanelClosed: () => setState(() {}),
+        maxHeight: MediaQuery.of(context).size.height * 0.65,
         color: AppTheme.primary,
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20), topRight: Radius.circular(20)),
@@ -143,18 +184,23 @@ class _MapViewState extends State<MapView> {
           onLongPress: _showOptions,
           markers: markers.values.toSet(),
           onMapCreated: (GoogleMapController controller) async {
-            _controller.complete(controller);
-            _addMarkers(await HuecaService.getHuecas());
+            if(this.mounted){
+              _controller.complete(controller);
+              _addMarkers(await HuecaService.getHuecas());
+            }
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.gps_fixed,
-          color: Color(0xFF59A5BD),
-        ),
-        onPressed: _localice,
-      ),
+      floatingActionButton:
+          panelController.isAttached && panelController.isPanelClosed || init
+              ? FloatingActionButton(
+                  child: Icon(
+                    Icons.gps_fixed,
+                    color: Color(0xFF59A5BD),
+                  ),
+                  onPressed: _localice,
+                )
+              : null,
     );
   }
 }
@@ -162,53 +208,195 @@ class _MapViewState extends State<MapView> {
 class Panel extends StatefulWidget {
   final Hueca hueca;
   const Panel({Key key, this.hueca}) : super(key: key);
-
   @override
   _PanelState createState() => _PanelState();
 }
 
 class _PanelState extends State<Panel> {
-  String _getStars() {
-    if (widget.hueca.ratings != 0) {
-      return (widget.hueca.stars / widget.hueca.ratings).toStringAsFixed(1);
-    }
-    return "0.0";
-  }
+  final url =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU";
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Nombre: ${widget.hueca?.name ?? ''} "),
-                Text("Descripción: ${widget.hueca?.descrip ?? ''}"),
-                Text("Dirección: ${widget.hueca?.address ?? ''}"),
-              ],
+            HeaderPanel(
+              url: url,
+              hueca: widget.hueca,
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("${_getStars()}"),
-                Icon(Icons.star, size: 16,),
-                Text("(${widget.hueca.ratings})")
-              ],
-            ),
-            RaisedButton(
-                child: Text("Calificar"),
-                onPressed: () => {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => RatingView(
-                                hueca: widget.hueca,
-                              )))
-                    })
+            BodyPanel(hueca: widget.hueca),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class BodyPanel extends StatelessWidget {
+  const BodyPanel({
+    Key key,
+    @required this.hueca,
+  }) : super(key: key);
+
+  final Hueca hueca;
+
+  String _getStars() {
+    if (hueca?.ratings ?? 0 != 0) {
+      (hueca?.stars ?? 0 / hueca?.ratings).toStringAsFixed(1);
+    }
+    return "0.0";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: ListView(
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 18.0),
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.5),
+              child: buildDirection(),
+            ),
+            buildRatings(context),
+          ],
+        )
+      ],
+    ));
+  }
+
+  RichText buildDirection() {
+    return RichText(
+        text: TextSpan(
+            text: 'Dirección: ',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            children: [
+          TextSpan(
+              text: "${hueca?.address ?? ''}",
+              style: TextStyle(fontWeight: FontWeight.normal))
+        ]));
+  }
+
+  Widget buildRatings(BuildContext context) {
+    return StatefulBuilder(builder: (context, setStarState) {
+      return Tooltip(
+        message: "${hueca?.ratings} calificaciones",
+        child: GestureDetector(
+          onTap: () => _onRatingTap(context, setStarState),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("${_getStars()}"),
+              Stack(
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: Color(0xFFDFFF1A),
+                    size: 20,
+                  ),
+                  Icon(
+                    Icons.star_border,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  void _onRatingTap(
+      BuildContext context, void Function(void Function()) setStarState) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => RatingView(
+              hueca: hueca,
+            )));
+    setStarState(() {});
+  }
+}
+
+class HeaderPanel extends StatelessWidget {
+  HeaderPanel({Key key, @required this.url, this.hueca}) : super(key: key);
+
+  final String url;
+  final Hueca hueca;
+  final TextStyle style = TextStyle(fontSize: 16);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+      child: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          BackGroundImageNetwork(url: url),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Material(
+              color: Color(0x88FFFFFF),
+              elevation: 10,
+              shadowColor: Colors.black,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${hueca?.name ?? ''} ",
+                      style: style,
+                    ),
+                    Text(
+                      "${hueca?.descrip ?? ''}",
+                      style: style,
+                    ),
+                    Text(
+                      "Abierto",
+                      style: style,
+                    ),
+                    Text(
+                      "Lunes - Viernes: 07:30-16:00\nSábado: 8:00-15:00",
+                      style: style,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class BackGroundImageNetwork extends StatelessWidget {
+  const BackGroundImageNetwork({
+    Key key,
+    @required this.url,
+  }) : super(key: key);
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: 0.9,
+      child: FadeInImage(
+        placeholder: AssetImage("assets/images/bg.jpg"),
+        image: NetworkImage(url),
+        fit: BoxFit.cover,
+        imageErrorBuilder: (context, error, stackTrace) =>
+            Image(image: AssetImage("assets/images/bg.jpg")),
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.22,
       ),
     );
   }
