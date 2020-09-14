@@ -8,9 +8,13 @@ class HuecaService {
 
   static Future<Map<String, dynamic>> post(Hueca hueca, List<Menu> menu) async {
     try {
-      final response = await _dio.post("/huecas", data: {"hueca": hueca.toJson(), "menues":  menu.map( (item) => item.toJson()).toList()});
+      final response = await _dio.post("/huecas", data: {
+        "hueca": hueca.toJson(),
+        "menues": menu.map((item) => item.toJson()).toList()
+      });
       return response.data;
-    } catch (_) {
+    } on DioError catch (ex) {
+      print(ex.response.data);
       return null;
     }
   }
@@ -27,5 +31,4 @@ class HuecaService {
       return null;
     }
   }
-
 }
