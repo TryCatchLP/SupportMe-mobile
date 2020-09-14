@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supportme/main.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/menu.dart';
 import 'package:supportme/services/hueca_service.dart';
@@ -19,12 +18,13 @@ class MenuView extends StatefulWidget {
 
 class _MenuViewState extends State<MenuView> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController nombreCtrl = new TextEditingController();
-  TextEditingController priceCtrl = new TextEditingController();
-  TextEditingController ingredintesCtrl = new TextEditingController();
-  TextEditingController nombreCtrl2 = new TextEditingController();
-  TextEditingController priceCtrl2 = new TextEditingController();
-  TextEditingController ingredintesCtrl2 = new TextEditingController();
+  List<Menu> listaMenu;
+
+  @override
+  void initState() {
+    super.initState();
+    listaMenu = [];
+  }
 
   _submit() async {
     showDialog(
@@ -34,23 +34,26 @@ class _MenuViewState extends State<MenuView> {
         ));
 
     Hueca hueca = widget.hueca;
-    Menu menu = Menu(
-      title: nombreCtrl.text, 
-      ingredients: ingredintesCtrl.text,
-      price: double.parse(priceCtrl.text),
-    );
-    Menu menu2 = Menu(
-      title: nombreCtrl2.text, 
-      ingredients: ingredintesCtrl2.text,
-      price: double.parse(priceCtrl2.text),
-    );
 
-    final res = await HuecaService.post(hueca, [menu, menu2]);
+    final res = await HuecaService.post(hueca, listaMenu);
     if (res != null) {
       Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
+  }
+
+  _changeState (String value) {
+    setState(() {});
+  }
+
+  Widget _builder(context, i) {
+    return ExpansionTile(
+      trailing: Icon(Icons.check),
+      title: Text(listaMenu[i].title),
+      children: [
+        FormMenu(menu: listaMenu[i], changeState: _changeState,),
+      ],
+    );
   }
 
   @override
@@ -65,24 +68,30 @@ class _MenuViewState extends State<MenuView> {
           key: _formKey,
           child: ListView(
             children: <Widget>[
-              FormMenu(
-                nombreCtrl: nombreCtrl,
-                priceCtrl: priceCtrl,
-                ingredintesCtrl: ingredintesCtrl,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  RaisedButton(
+                    color: Colors.orangeAccent,
+                    onPressed: () {
+                      setState(() {
+                        listaMenu.insert(
+                            0,
+                            Menu(
+                              title: "",
+                              ingredients: "",
+                              price: 0.0,
+                            ));
+                      });
+                    },
+                    child: Text('+ AÑADIR'),
+                  ),
+                ],
               ),
-              SizedBox(height: 25.0),
-              const Divider(
-                color: Colors.black,
-                height: 10,
-                thickness: 3,
-                indent: 0,
-                endIndent: 0,
-              ),
-              SizedBox(height: 25.0),
-              FormMenu(
-                nombreCtrl: nombreCtrl2,
-                priceCtrl: priceCtrl2,
-                ingredintesCtrl: ingredintesCtrl2,
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: listaMenu == null ? 0 : listaMenu.length,
+                itemBuilder: _builder,
               ),
               SizedBox(height: 25.0),
               RaisedButton(
@@ -107,29 +116,49 @@ class CustomField extends StatelessWidget {
   final String hintText;
   final String labelText;
   final IconData icon;
+  final TextInputType textInput;
+  final TextCapitalization textCapitalization;
   final TextEditingController mobileCtrl;
   final Function(String) validate;
+  final bool enabled;
+  final bool obscureText;
+  final IconButton iconButton;
+  final String initialValue;
+  final onChanged;
 
   CustomField({
     Key key,
+    this.enabled,
     this.hintText,
     this.labelText,
     this.icon,
+    this.textInput,
+    this.textCapitalization,
     this.mobileCtrl,
     this.validate,
+    this.obscureText,
+    this.iconButton,
+    this.onChanged,
+    this.initialValue,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: mobileCtrl,
+      initialValue: initialValue,
       decoration: InputDecoration(
         hintText: hintText,
         labelText: labelText ?? hintText,
-        suffixIcon: Icon(icon),
+        suffixIcon: iconButton ?? Icon(icon),
+        //prefix: CircularProgressIndicator(),
       ),
-      keyboardType: TextInputType.text,
+      keyboardType: textInput ?? TextInputType.text,
+      textCapitalization: textCapitalization ?? TextCapitalization.sentences,
       validator: validate,
+      enabled: enabled ?? true,
+      obscureText: obscureText ?? false,
+      onChanged: onChanged,
     );
   }
 }
@@ -146,15 +175,13 @@ String validatePrice(String value) {
 }
 
 class FormMenu extends StatelessWidget {
-  final TextEditingController nombreCtrl;
-  final TextEditingController priceCtrl;
-  final TextEditingController ingredintesCtrl;
+  final Menu menu;
+  final changeState;
 
   FormMenu({
     Key key,
-    this.nombreCtrl,
-    this.priceCtrl,
-    this.ingredintesCtrl,
+    this.menu,
+    this.changeState,
   }) : super(key: key);
 
   String _validate(value) {
@@ -170,28 +197,36 @@ class FormMenu extends StatelessWidget {
       child: Column(
         children: [
           CustomField(
+            initialValue: menu.title,
             hintText: 'Nombre',
-            mobileCtrl: nombreCtrl,
             validate: _validate,
+            onChanged: (text) {
+              changeState(text);
+              menu.title = text;
+            },
           ),
           SizedBox(height: 15.0),
           Card(
               color: Colors.grey[350],
               child: TextFormField(
-                controller: ingredintesCtrl,
+                initialValue: menu.ingredients,
+                onChanged: (text) {
+                  menu.ingredients = text;
+                },
                 maxLines: 4,
                 decoration: InputDecoration(hintText: "Ingredientes"),
                 validator: _validate,
               )),
           SizedBox(height: 15.0),
-          TextFormField(
-              controller: priceCtrl,
-              decoration: InputDecoration(
-                hintText: 'Precio',
-                labelText: 'Precio',
-              ),
-              keyboardType: TextInputType.phone,
-              validator: validatePrice),
+          CustomField(
+            onChanged: (text) {
+              menu.price = double.parse(text);
+            },
+            hintText: 'Precio',
+            textInput: TextInputType.phone,
+            validate: validatePrice,
+            initialValue: "${menu.price}",
+          ),
           SizedBox(height: 25.0),
         ],
       ),

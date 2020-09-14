@@ -10,6 +10,7 @@ class Hueca {
     this.phone,
     this.stars,
     this.ratings,
+    this.schedule,
   });
 
   int id;
@@ -22,11 +23,13 @@ class Hueca {
   String phone;
   int stars;
   int ratings;
+  String schedule;
 
   factory Hueca.fromJson(Map<String, dynamic> json) => Hueca(
         id: json["id"],
         name: json["name"],
         descrip: json["descrip"],
+        schedule: json["schedule"],
         lat: json["lat"].toDouble(),
         lng: json["lng"].toDouble(),
         address: json["address"],
@@ -39,6 +42,7 @@ class Hueca {
   Map<String, dynamic> toJson() => {
         "name": name,
         "descrip": descrip,
+        "schedule": schedule,
         "lat": lat,
         "lng": lng,
         "address": address,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/views/hueca.dart';
 import 'package:supportme/views/map_view.dart';
+import 'package:supportme/views/profile.dart';
 import 'buscar.dart';
 import 'login.dart';
 
@@ -22,7 +23,7 @@ class _HomeState extends State<Home> {
 
   _onItemTap(int index) async {
     setState(() {
-      if (index == 0 || index == 3) _bottomNavigationIndex = index;
+      if (index == 0 || index == 2 || index == 3) _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:
@@ -35,8 +36,9 @@ class _HomeState extends State<Home> {
             .push(MaterialPageRoute(builder: (context) => BuscarView()));
         break;
       case 2:
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => HuecaView()));
+        setState(() {
+          _widget = HuecaView();
+        });
         break;
       case 3:
         if (Session.instance.isAuthenticate) {
@@ -91,7 +93,8 @@ class BottomMenu extends StatelessWidget {
               icon: Icon(Icons.home), title: Text("Inicio")),
           BottomNavigationBarItem(
               icon: Icon(Icons.search), title: Text("Buscar")),
-          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Nuevo")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add), title: Text("Nuevo")),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text("Perfil"))
         ]);
