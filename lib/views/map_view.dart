@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/services/hueca_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 import 'Rating.dart';
+import 'login.dart';
 
 class MapView extends StatefulWidget {
   @override
@@ -87,7 +89,7 @@ class _MapViewState extends State<MapView> {
   _addMarkers(List<Hueca> huecas) async {
     final Uint8List markerIcon =
         await getBytesFromAsset("assets/images/logo.png", 100);
-    if(this.mounted){
+    if (this.mounted) {
       setState(() {
         for (Hueca hueca in huecas) {
           MarkerId markerId = MarkerId("${hueca.id}");
@@ -184,7 +186,7 @@ class _MapViewState extends State<MapView> {
           onLongPress: _showOptions,
           markers: markers.values.toSet(),
           onMapCreated: (GoogleMapController controller) async {
-            if(this.mounted){
+            if (this.mounted) {
               _controller.complete(controller);
               _addMarkers(await HuecaService.getHuecas());
             }
@@ -243,8 +245,8 @@ class BodyPanel extends StatelessWidget {
   final Hueca hueca;
 
   String _getStars() {
-    if (hueca?.ratings ?? 0 != 0) {
-      (hueca?.stars ?? 0 / hueca?.ratings).toStringAsFixed(1);
+    if (hueca?.ratings != null && hueca?.ratings != 0) {
+      return (hueca.stars / hueca.ratings).toStringAsFixed(1);
     }
     return "0.0";
   }
@@ -315,11 +317,23 @@ class BodyPanel extends StatelessWidget {
 
   void _onRatingTap(
       BuildContext context, void Function(void Function()) setStarState) async {
-    await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => RatingView(
-              hueca: hueca,
-            )));
-    setStarState(() {});
+    if (Session.instance.isAuthenticate) {
+      await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => RatingView(
+                hueca: hueca,
+              )));
+      setStarState(() {});
+    } else {
+      bool login = await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => Login()));
+      if (login ?? false) {
+        await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => RatingView(
+                  hueca: hueca,
+                )));
+        setStarState(() {});
+      }
+    }
   }
 }
 
