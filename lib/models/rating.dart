@@ -10,7 +10,7 @@ class Rating {
   Map<String, dynamic> toJson(){
     return {
       "stars": this.stars,
-      "user_id": this.userid,
+      //"user_id": this.userid,
       "hueca_id": this.huecaid,
       "comentario": this.comentario ?? '<no comment>',
     };
