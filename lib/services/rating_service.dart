@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/rating.dart';
 
 class RaatingService {
@@ -7,6 +8,7 @@ class RaatingService {
 
   static Future<Map<String, dynamic>> post(Rating rating) async {
     try {
+      _dio.options.headers.addAll(Session.instance.authorization);
       final response = await _dio.post("/ratings", data: rating.toJson());
       return response.data;
     } on DioError catch (ex) {
