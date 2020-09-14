@@ -26,8 +26,7 @@ class _RatingViewState extends State<RatingView> {
     Rating rating = Rating(
         comentario: comment.text.isEmpty ? "<no comment>" : comment.text,
         huecaid: widget.hueca.id,
-        stars: this.rating,
-        userid: 1);
+        stars: this.rating);
     showDialog(
         context: context,
         child: Center(
