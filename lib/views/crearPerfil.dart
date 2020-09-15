@@ -143,7 +143,7 @@ class CrearPerfilState extends State<CrearPerfil> {
           Padding(
             padding: EdgeInsets.fromLTRB(60, 8, 60, 8),
             child: RaisedButton(
-              color: Colors.amber,
+              color: Color(0xFFF1D57F),
               onPressed: () {
                 if (_claveFormulario.currentState.validate()) {
                 }
