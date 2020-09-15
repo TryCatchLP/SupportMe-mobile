@@ -1,10 +1,12 @@
-// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+﻿// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:supportme/models/user.dart';
+import 'package:supportme/auth/session.dart';
 
-//void main() => runApp(MyApp());
+//void main() => runApp(CrearPerfilView());
 
 class CrearPerfilView extends StatelessWidget {
   @override
@@ -29,12 +31,52 @@ class CrearPerfil extends StatefulWidget {
 class CrearPerfilState extends State<CrearPerfil> {
   CrearPerfilState({Key key}) : super();
   final _claveFormulario = GlobalKey<FormState>();
-  final TextEditingController _correo = TextEditingController();
-  final TextEditingController _nombre = TextEditingController();
-  final TextEditingController _apellido = TextEditingController();
-  final TextEditingController _contrasena = TextEditingController();
-  final TextEditingController _validarPass = TextEditingController();
+  final TextEditingController correo = TextEditingController();
+  final TextEditingController nombre = TextEditingController();
+  final TextEditingController apellido = TextEditingController();
+  final TextEditingController contrasena = TextEditingController();
+  final TextEditingController validarPass = TextEditingController();
+  final TextEditingController id = TextEditingController();
   
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  _submit() async {
+    showDialog(
+        context: context,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ));
+    User user = User(
+        id: int.tryParse(id.text),
+        username: nombre.text,
+        name: nombreCtrl.text,
+        lastname: nombreCtrl.text,
+        address: " ",
+        phone: 0,
+        email: nombreCtrl.text,
+    );
+    final res = await Session.instance.profileCreated(user,password);
+    Navigator.pop(context);
+    //bool aceptado = await Navigator.push(context),
+        //MaterialPageRoute(builder: (context) => MenuView(user: user))
+      
+
+    //if(aceptado != null){
+      //correo.text = "";
+      //nombre.text = "";
+      //apellido.text = "";
+      //contrasena.text = "";
+      //validarPass.text = "";
+    //}
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +84,7 @@ class CrearPerfilState extends State<CrearPerfil> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           },
         ),
         title: Text("Crear Cuenta", style:(TextStyle(color: Colors.black))),
@@ -66,7 +108,7 @@ class CrearPerfilState extends State<CrearPerfil> {
             child: TextFormField(
               keyboardType: TextInputType.emailAddress,
               validator:validateEmail,
-              controller: _correo,
+              controller:correo,
               decoration: InputDecoration(
                 hintText: 'Correo',
                 labelText: 'Correo',
@@ -83,7 +125,7 @@ class CrearPerfilState extends State<CrearPerfil> {
                 }
                 return null;
               },
-              controller: _nombre,
+              controller: nombre,
               decoration: InputDecoration(
                 hintText: 'Nombre',
                 labelText: 'Nombre',
@@ -100,7 +142,7 @@ class CrearPerfilState extends State<CrearPerfil> {
                 }
                 return null;
               },
-              controller: _apellido,
+              controller: apellido,
               decoration: InputDecoration(
                 hintText: 'Apellido',
                 labelText: 'Apellido',
@@ -119,7 +161,7 @@ class CrearPerfilState extends State<CrearPerfil> {
                 return null;
               },
               obscureText: true,
-              controller: _contrasena,
+              controller: contrasena,
               decoration: InputDecoration(
                 hintText: 'Contraseña',
                 labelText: 'Contraseña',
@@ -132,7 +174,7 @@ class CrearPerfilState extends State<CrearPerfil> {
             child: TextFormField(
               obscureText: true,
               validator:validatePassword,
-              controller: _validarPass,
+              controller: validarPass,
               decoration: InputDecoration(
                 hintText: 'Confirmar contraseña',
                 labelText: 'Confirmar contraseña',
@@ -146,6 +188,7 @@ class CrearPerfilState extends State<CrearPerfil> {
               color: Color(0xFFF1D57F),
               onPressed: () {
                 if (_claveFormulario.currentState.validate()) {
+                  _submit();
                 }
               },
               child: Text('REGISTRARSE'),
@@ -156,8 +199,8 @@ class CrearPerfilState extends State<CrearPerfil> {
     );
   }
   String validatePassword(String value) {
-   print("valorrr $value passsword ${_contrasena.text}");
-   if (value != _contrasena.text) {
+   print("valorrr $value passsword ${contrasena.text}");
+   if (value != contrasena.text) {
      return "Las contraseñas no coinciden";
    }
    return null;

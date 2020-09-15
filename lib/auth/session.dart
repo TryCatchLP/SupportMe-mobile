@@ -81,4 +81,26 @@ class Session {
     }
     return false;
   }
+Future<bool> profileCreated(User user, String contrasena) async {
+    Map<String, dynamic> data=user.toJson();
+    data.remove("id");
+    data["password"]=contrasena;
+    data["c_password"]=contrasena;
+    if (isAuthenticate) {
+      try {
+        _dio.options.headers = Session.instance.authorization;
+        final response = await _dio.post('/profile', data: data);
+        if (response.statusCode == 200) {
+          _token = response.data["success"]["token"];
+          await storage.write(key: "token", value: _token);
+          return true;
+        }
+        return false;
+      } on DioError catch (ex) {
+        print(ex.response.data);
+        return false;
+      }
+    }
+    return false;
+  }
 }
