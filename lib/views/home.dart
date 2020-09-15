@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
         break;
       case 2:
         setState(() {
-          _widget = HuecaView();
+          _widget = HuecaView(latLng: latLng,);
         });
         break;
       case 3:

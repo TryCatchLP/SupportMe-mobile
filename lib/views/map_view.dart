@@ -27,6 +27,7 @@ class _MapViewState extends State<MapView> {
   Completer<GoogleMapController> _controller = Completer();
   Map<MarkerId, Marker> markers = Map<MarkerId, Marker>();
   GlobalKey<ScaffoldState> _scaff = GlobalKey<ScaffoldState>();
+  GlobalKey<_PanelState> _panel = GlobalKey<_PanelState>();
   PanelController panelController = PanelController();
   Hueca hueca;
   LatLng _latLng;
@@ -178,6 +179,7 @@ class _MapViewState extends State<MapView> {
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         panel: Panel(
+          key: _panel,
           hueca: hueca,
         ),
         body: GoogleMap(
@@ -220,6 +222,9 @@ class Panel extends StatefulWidget {
 
 class _PanelState extends State<Panel> {
 
+  
+  final url = "https://pbs.twimg.com/media/D38wwCmW4AEp8lo.jpg";
+  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -227,7 +232,9 @@ class _PanelState extends State<Panel> {
         child: Column(
           children: [
             HeaderPanel(
-              url: widget.hueca?.photo ?? "",
+              url: widget.hueca?.photo != null && widget.hueca?.photo != "C://"
+                  ? "http://localhost:8000/${widget.hueca?.photo}"
+                  : url,
               hueca: widget.hueca,
             ),
             BodyPanel(hueca: widget.hueca),
