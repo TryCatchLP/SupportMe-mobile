@@ -9,7 +9,7 @@ class Session {
 
   final storage = FlutterSecureStorage();
   Map<String, String> get authorization =>
-      isAuthenticate ? {"Auhotization": "Bearer $_token"} : {};
+      isAuthenticate ? {"Authorization": "Bearer $_token"} : {};
   final Dio _dio = Dio(BaseOptions(
       baseUrl: "http://localhost:8000/api", contentType: "application/json"));
 

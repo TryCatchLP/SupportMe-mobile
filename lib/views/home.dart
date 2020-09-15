@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/views/hueca.dart';
 import 'package:supportme/views/map_view.dart';
@@ -17,18 +18,22 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    _widget = MapView();
+    _widget = MapView(
+      onAddHueca: (latLng) => _onItemTap(2, latLng: latLng),
+    );
     super.initState();
   }
 
-  _onItemTap(int index) async {
+  _onItemTap(int index, {LatLng latLng}) async {
     setState(() {
       if (index == 0 || index == 2 || index == 3) _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:
         setState(() {
-          _widget = MapView();
+          _widget = MapView(
+            onAddHueca: (latLng) => _onItemTap(2, latLng: latLng),
+          );
         });
         break;
       case 1:
@@ -43,14 +48,14 @@ class _HomeState extends State<Home> {
       case 3:
         if (Session.instance.isAuthenticate) {
           setState(() {
-            _widget = Container();
+            _widget = ProfileView();
           });
         } else {
           bool login = await Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => Login()));
           if(login ?? false){
             setState(() {
-            _widget = Container();
+            _widget = ProfileView();
             });
           }
         }

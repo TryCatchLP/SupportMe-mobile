@@ -9,12 +9,16 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/services/hueca_service.dart';
+import 'package:supportme/services/location_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 import 'Rating.dart';
 import 'login.dart';
 
 class MapView extends StatefulWidget {
+  final Function(LatLng) onAddHueca;
+
+  MapView({Key key, this.onAddHueca}) : super(key: key);
   @override
   _MapViewState createState() => _MapViewState();
 }
@@ -46,9 +50,9 @@ class _MapViewState extends State<MapView> {
   );
 
   Future<void> _localice() async {
-    //final GoogleMapController controller = await _controller.future;
-
-    //controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+    LatLng latLng = await LocationService.getUserLocation();
+    this._showOptions(latLng);
+    this._zoomMap(latLng);
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -80,10 +84,11 @@ class _MapViewState extends State<MapView> {
       markers[markerId] = marker;
     });
     await Future.delayed(Duration(seconds: 60));
-    setState(() {
-      markers.remove(markerId);
-      _scaff.currentState.hideCurrentSnackBar();
-    });
+    if(this.mounted)
+      setState(() {
+        markers.remove(markerId);
+        _scaff.currentState.hideCurrentSnackBar();
+      });
   }
 
   _addMarkers(List<Hueca> huecas) async {
@@ -123,14 +128,13 @@ class _MapViewState extends State<MapView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(Icons.add),
-          title: Text("Añadir hueca"),
-          onTap: () {
-            print(_latLng);
-          },
-        ),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.add),
+            title: Text("Añadir hueca"),
+            onTap: () {
+              this.widget.onAddHueca(_latLng);
+            }),
         ListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
