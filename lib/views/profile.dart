@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:supportme/auth/session.dart';
+import 'package:supportme/models/user.dart';
 import 'package:supportme/views/user_ratings.dart';
 
 class ProfileView extends StatefulWidget {
@@ -9,34 +12,52 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   final _formKey = GlobalKey<FormState>();
   bool _activado;
-  bool _obscureTextpass;
-  bool _obscureTextpass2;
-
-  @override
-  void initState() {
-    super.initState();
-    _activado = false;
-    _obscureTextpass = true;
-    _obscureTextpass2 = true;
-
-    nombreCtrl.text = "Steven";
-    apellidoCtrl.text = "Araujo";
-    correoCtrl.text = "steven@correo.com";
-    passCtrl.text = "prueba123";
-    passCtrl2.text = "prueba123";
-  }
-
+  //bool _obscureTextpass;
+  //bool _obscureTextpass2;
+  TextEditingController idCtrl = new TextEditingController();
+  TextEditingController usernameCtrl = new TextEditingController();
   TextEditingController nombreCtrl = new TextEditingController();
   TextEditingController apellidoCtrl = new TextEditingController();
   TextEditingController correoCtrl = new TextEditingController();
-  TextEditingController passCtrl = new TextEditingController();
-  TextEditingController passCtrl2 = new TextEditingController();
+  TextEditingController direccionCtrl = new TextEditingController();
+  TextEditingController telefonoCtrl = new TextEditingController();
+
+  @override
+  void initState() {
+    Future.delayed(
+        Duration.zero,
+        () => showDialog(
+            barrierDismissible: false,
+            context: context,
+            child: Center(child: CircularProgressIndicator())));
+
+    Session.instance.profile().then((value) {
+      
+      setState(
+          () => {
+            idCtrl.text = value.id.toString(),
+            usernameCtrl.text = value.username,
+            nombreCtrl.text = value.firstname,
+            apellidoCtrl.text = value.lastname,
+            direccionCtrl.text = value.address,
+            telefonoCtrl.text = value.phone,
+            correoCtrl.text = value.email,
+          }); //hay que hacer un cambio de estado con el then
+      Navigator.pop(context);
+    });
+
+    super.initState();
+    _activado = false;
+    //_obscureTextpass = true;
+    //_obscureTextpass2 = true;
+  }
 
   String _validate(value) {
     if (value.isEmpty) return 'Campo vacío';
     return null;
   }
 
+/*
   String _validatePss(value) {
     if (value.length == 0)
       return 'Ingrese contraseña.';
@@ -46,29 +67,41 @@ class _ProfileViewState extends State<ProfileView> {
       return 'No coinciden las contraseñas';
     return null;
   }
+*/
 
   _submit() async {
     showDialog(
-        context: context,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ));
-    /*
-    Hueca hueca = Hueca(
-        name: nombreCtrl.text,
-        descrip: descripcionCtrl.text,
-        lat: double.parse(latitudCtrl.text),
-        lng: double.parse(longitudCtrl.text),
-        address: direccionCtrl.text,
-        photo: "C://",
-        phone: telefonoCtrl.text,
-        //schedule: horarioCtrl.text,
-        stars: 0,
-        ratings: 0);
-  
-    */
+      context: context,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
+    ) ;
 
+    User user = User(
+      id: int.tryParse(idCtrl.text),//Ya no es necesario
+      username: usernameCtrl.text,
+      firstname: nombreCtrl.text,
+      lastname: apellidoCtrl.text,
+      address: direccionCtrl.text,
+      phone: telefonoCtrl.text,
+      email: correoCtrl.text
+    );
+    final res = await Session.instance.profileUpdate(user);
     Navigator.pop(context);
+    setState(() {
+      _activado = !_activado;
+    });
+
+    if (res != false) {  
+      Fluttertoast.showToast(
+        msg: "Perfil actualizado exitosamente!",
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error al actualizar perfil!",
+      );
+    }
     //Navigator.push(context, MaterialPageRoute(builder: (context) => MenuView(hueca: hueca)));
   }
 
@@ -95,15 +128,15 @@ class _ProfileViewState extends State<ProfileView> {
         child: ListView(padding: const EdgeInsets.all(40.0), children: <Widget>[
           CustomField(
             hintText: 'Nombre',
-            icon: Icons.person_outline,
             mobileCtrl: nombreCtrl,
+            icon: Icons.person_outline,
             validate: _validate,
             enabled: _activado,
           ),
           CustomField(
             hintText: 'Apellido',
-            icon: Icons.person_outline,
             mobileCtrl: apellidoCtrl,
+            icon: Icons.person_outline,
             validate: _validate,
             enabled: _activado,
           ),
@@ -111,55 +144,37 @@ class _ProfileViewState extends State<ProfileView> {
             hintText: 'Correo',
             icon: Icons.email,
             mobileCtrl: correoCtrl,
+            validate: validateEmail,
+            textInput: TextInputType.emailAddress,
+            enabled: _activado,
+          ),
+          CustomField(
+            hintText: 'Direccion',
+            icon: Icons.pin_drop,
+            mobileCtrl: direccionCtrl,
             validate: _validate,
-            textInput: TextInputType.emailAddress,
             enabled: _activado,
           ),
-          CustomField(
-            hintText: 'Contraseña',
-            mobileCtrl: passCtrl,
-            validate: _validatePss,
-            textInput: TextInputType.emailAddress,
-            enabled: _activado,
-            obscureText: _obscureTextpass,
-            textCapitalization: TextCapitalization.none,
-            iconButton: IconButton(
-              icon: Icon(
-                  _obscureTextpass ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _obscureTextpass = !_obscureTextpass;
-                });
-              },
+          TextFormField(
+            controller: telefonoCtrl,
+            decoration: InputDecoration(
+              hintText: 'Teléfono',
+              labelText: 'Teléfono',
+              suffixIcon: Icon(Icons.phone),
             ),
-          ),
-          CustomField(
-            hintText: 'Comprobar contraseña',
-            mobileCtrl: passCtrl2,
-            validate: _validatePss,
-            textInput: TextInputType.emailAddress,
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
+            validator: validateMobile,
             enabled: _activado,
-            obscureText: _obscureTextpass2,
-            textCapitalization: TextCapitalization.none,
-            iconButton: IconButton(
-              icon: Icon(
-                  _obscureTextpass2 ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  _obscureTextpass2 = !_obscureTextpass2;
-                });
-              },
-            ),
           ),
           SizedBox(height: 20.0),
           Opacity(
-            opacity: _activado? 1.0: 0.0,
+            opacity: _activado ? 1.0 : 0.0,
             child: RaisedButton(
               onPressed: _activado
                   ? () {
                       if (_formKey.currentState.validate()) {
                         _submit();
-                        // Process data.
                       }
                     }
                   : null,
@@ -169,9 +184,12 @@ class _ProfileViewState extends State<ProfileView> {
           SizedBox(height: 130.0),
           FlatButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> UserRatingsView()));
               if (_formKey.currentState.validate()) {
-                _submit();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserRatingsView(),
+                    ));
                 // Process data.
               }
             },
@@ -219,6 +237,8 @@ class CustomField extends StatelessWidget {
   final bool enabled;
   final bool obscureText;
   final IconButton iconButton;
+  final String initialValue;
+  final onChanged;
 
   CustomField({
     Key key,
@@ -232,12 +252,15 @@ class CustomField extends StatelessWidget {
     this.validate,
     this.obscureText,
     this.iconButton,
+    this.onChanged,
+    this.initialValue,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: mobileCtrl,
+      initialValue: initialValue,
       decoration: InputDecoration(
         hintText: hintText,
         labelText: labelText ?? hintText,
@@ -249,6 +272,33 @@ class CustomField extends StatelessWidget {
       validator: validate,
       enabled: enabled ?? true,
       obscureText: obscureText ?? false,
+      onChanged: onChanged,
     );
+  }
+}
+
+String validateMobile(String value) {
+  String pattern = r'(^[0-9]*$)';
+  RegExp regExp = new RegExp(pattern);
+  if (value.length == 0) {
+    return "El telefono es necesario.";
+  } else if (!regExp.hasMatch(value)) {
+    return "Teléfono invalido.";
+  } else if (value.length != 10) {
+    return "El numero debe tener 10 digitos";
+  }
+  return null;
+}
+
+String validateEmail(String value) {
+  String pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regExp = new RegExp(pattern);
+  if (value.length == 0) {
+    return "El correo es necesario";
+  } else if (!regExp.hasMatch(value)) {
+    return "Correo invalido";
+  } else {
+    return null;
   }
 }

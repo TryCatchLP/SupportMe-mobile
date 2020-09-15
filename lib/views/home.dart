@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
 
   _onItemTap(int index, {LatLng latLng}) async {
     setState(() {
-      if (index == 0 || index == 2 || index == 3) _bottomNavigationIndex = index;
+      if (index == 0 || index == 2 || (index == 3 && Session.instance.isAuthenticate)) _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:

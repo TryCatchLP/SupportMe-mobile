@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/theme/theme.dart';
+import 'package:supportme/views/crearPerfil.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -133,7 +134,10 @@ class RegisterSection extends StatelessWidget {
               Text("¿N0 TIENE UNA CUENTA?"),
               FlatButton(
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CrearPerfilView()));
+                },
                 child: Text(
                   "REGISTRARSE",
                 ),

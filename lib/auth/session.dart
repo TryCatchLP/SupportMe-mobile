@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:supportme/models/user.dart';
 
 class Session {
   static Session instance = Session._();
@@ -40,5 +41,44 @@ class Session {
       storage.delete(key: "token");
       _token = null;
     }
+  }
+
+  Future<User> profile() async {
+    if (isAuthenticate) {
+      try {
+        _dio.options.headers = Session.instance.authorization;
+        final response = await _dio.get('/profile');
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = response.data;
+          //return response()->json(['success' => $user], $this-> successStatus)
+          //Por eso accedo al success 
+          return User.fromJson(data["success"]);
+        }
+        return User.zero();
+      } on DioError catch (ex) {
+        print(ex.response.data);
+        return User.zero();
+      }
+    }
+    return User.zero();
+  }
+
+  Future<bool> profileUpdate(User user) async {
+    if (isAuthenticate) {
+      try {
+        _dio.options.headers = Session.instance.authorization;
+        final response = await _dio.put('/profile', data: user.toJson());
+        if (response.statusCode == 200) {
+          //return response()->json(['success' => $user], $this-> successStatus)
+          //Por eso accedo al success 
+          return true;
+        }
+        return false;
+      } on DioError catch (ex) {
+        print(ex.response.data);
+        return false;
+      }
+    }
+    return false;
   }
 }

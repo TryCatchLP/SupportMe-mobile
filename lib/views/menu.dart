@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/menu.dart';
 import 'package:supportme/services/hueca_service.dart';
@@ -28,10 +29,12 @@ class _MenuViewState extends State<MenuView> {
 
   _submit() async {
     showDialog(
-        context: context,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ));
+      context: context,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
+    );
 
     Hueca hueca = widget.hueca;
 
@@ -39,10 +42,15 @@ class _MenuViewState extends State<MenuView> {
     if (res != null) {
       Navigator.pop(context);
       Navigator.pop(context, true);
+    } else {
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: "Error al crear la hueca",
+      );
     }
   }
 
-  _changeState (String value) {
+  _changeState(String value) {
     setState(() {});
   }
 
@@ -51,7 +59,10 @@ class _MenuViewState extends State<MenuView> {
       trailing: Icon(Icons.check),
       title: Text(listaMenu[i].title),
       children: [
-        FormMenu(menu: listaMenu[i], changeState: _changeState,),
+        FormMenu(
+          menu: listaMenu[i],
+          changeState: _changeState,
+        ),
       ],
     );
   }

@@ -31,10 +31,12 @@ class _HuecaViewState extends State<HuecaView> {
 
   _submit() async {
     showDialog(
-        context: context,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ));
+      context: context,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
+    );
     Hueca hueca = Hueca(
         name: nombreCtrl.text,
         descrip: descripcionCtrl.text,

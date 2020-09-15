@@ -42,7 +42,7 @@ class CrearPerfilState extends State<CrearPerfil> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
         title: Text("Crear Cuenta", style:(TextStyle(color: Colors.black))),
@@ -114,15 +114,15 @@ class CrearPerfilState extends State<CrearPerfil> {
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value.isEmpty) {
-                  return 'Ingrese una contraseña';
+                  return 'Ingrese una contraseÃ±a';
                 }
                 return null;
               },
               obscureText: true,
               controller: _contrasena,
               decoration: InputDecoration(
-                hintText: 'Contraseña',
-                labelText: 'Contraseña',
+                hintText: 'ContraseÃ±a',
+                labelText: 'ContraseÃ±a',
                 suffixIcon: Icon(Icons.lock),
               ),
             ),
@@ -134,8 +134,8 @@ class CrearPerfilState extends State<CrearPerfil> {
               validator:validatePassword,
               controller: _validarPass,
               decoration: InputDecoration(
-                hintText: 'Confirmar contraseña',
-                labelText: 'Confirmar contraseña',
+                hintText: 'Confirmar contraseÃ±a',
+                labelText: 'Confirmar contraseÃ±a',
                 suffixIcon: Icon(Icons.lock_open),
               ),
             ),
@@ -158,7 +158,7 @@ class CrearPerfilState extends State<CrearPerfil> {
   String validatePassword(String value) {
    print("valorrr $value passsword ${_contrasena.text}");
    if (value != _contrasena.text) {
-     return "Las contraseñas no coinciden";
+     return "Las contraseÃ±as no coinciden";
    }
    return null;
  }
