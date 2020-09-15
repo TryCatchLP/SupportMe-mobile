@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supportme/views/user_ratings.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -168,6 +169,7 @@ class _ProfileViewState extends State<ProfileView> {
           SizedBox(height: 130.0),
           FlatButton(
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> UserRatingsView()));
               if (_formKey.currentState.validate()) {
                 _submit();
                 // Process data.

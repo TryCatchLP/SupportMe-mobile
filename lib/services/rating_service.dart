@@ -21,7 +21,8 @@ class RaatingService {
 
   static Future<Map<String, dynamic>> update(Rating rating) async {
     try {
-      final response = await _dio.put("/ratings/${rating.id}", data: rating.toJson());
+      final response =
+          await _dio.put("/ratings/${rating.id}", data: rating.toJson());
       return response.data;
     } on DioError catch (ex) {
       print(ex.response.data);
@@ -40,6 +41,20 @@ class RaatingService {
     } on DioError catch (ex) {
       print(ex.response.data);
       return Rating.zero();
+    }
+  }
+
+  static Future<List<Rating>> getUserRatings() async {
+    try {
+      final response = await _dio.get("/ratings");
+      List<Rating> ratings = List<Rating>();
+      for (var json in response.data) {
+        ratings.add(Rating.fromJsonDetail(json));
+      }
+      return ratings;
+    } on DioError catch (ex) {
+      print(ex.response.data);
+      return null;
     }
   }
 }

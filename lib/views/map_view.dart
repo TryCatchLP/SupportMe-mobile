@@ -84,7 +84,7 @@ class _MapViewState extends State<MapView> {
       markers[markerId] = marker;
     });
     await Future.delayed(Duration(seconds: 60));
-    if(this.mounted)
+    if (this.mounted)
       setState(() {
         markers.remove(markerId);
         _scaff.currentState.hideCurrentSnackBar();
@@ -219,8 +219,6 @@ class Panel extends StatefulWidget {
 }
 
 class _PanelState extends State<Panel> {
-  final url =
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU";
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +227,7 @@ class _PanelState extends State<Panel> {
         child: Column(
           children: [
             HeaderPanel(
-              url: url,
+              url: widget.hueca?.photo,
               hueca: widget.hueca,
             ),
             BodyPanel(hueca: widget.hueca),
@@ -380,9 +378,13 @@ class HeaderPanel extends StatelessWidget {
                       "Abierto",
                       style: style,
                     ),
-                    Text(
-                      "Lunes - Viernes: 07:30-16:00\nSábado: 8:00-15:00",
-                      style: style,
+                    Container(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.55),
+                      child: Text(
+                        "${hueca?.schedule}",
+                        style: style,
+                      ),
                     )
                   ],
                 ),
