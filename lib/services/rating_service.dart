@@ -57,4 +57,14 @@ class RaatingService {
       return null;
     }
   }
+
+  static Future<bool> delete(Rating rating) async {
+    try {
+      await _dio.delete("/ratings/${rating.id}");
+      return true;
+    } on DioError catch (ex) {
+      print(ex.response.data);
+      return false;
+    }
+  }
 }

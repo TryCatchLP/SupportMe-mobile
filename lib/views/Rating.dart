@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 import 'package:supportme/services/rating_service.dart';
@@ -9,8 +8,9 @@ import 'package:supportme/theme/theme.dart';
 
 class RatingView extends StatefulWidget {
   final Hueca hueca;
+  final Rating rating;
 
-  const RatingView({Key key, this.hueca}) : super(key: key);
+  const RatingView({Key key, this.hueca, this.rating}) : super(key: key);
 
   @override
   _RatingViewState createState() => _RatingViewState();
@@ -53,7 +53,7 @@ class _RatingViewState extends State<RatingView> {
         widget.hueca.ratings += 1;
       }
       Navigator.pop(context);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
       Fluttertoast.showToast(
           msg: "Calificado con éxito", toastLength: Toast.LENGTH_LONG);
     } else {
@@ -82,7 +82,9 @@ class _RatingViewState extends State<RatingView> {
               height: 15,
             ),
             FutureBuilder(
-                future: RaatingService.getUserRatingHueca(widget.hueca),
+                future: widget.rating != null
+                    ? Future.value(widget.rating)
+                    : RaatingService.getUserRatingHueca(widget.hueca),
                 builder: (context, AsyncSnapshot<Rating> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Rating value = snapshot.data;
@@ -92,7 +94,7 @@ class _RatingViewState extends State<RatingView> {
                     rating = value..huecaid = widget.hueca.id;
                     oldStars = rating.stars;
                     _ratingState.currentState.update(rating.stars);
-                    Navigator.pop(context);
+                    Future.delayed(Duration.zero, () => Navigator.pop(context));
                     return buildColumn(rating);
                   } else {
                     Future.delayed(

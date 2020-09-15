@@ -227,7 +227,7 @@ class _PanelState extends State<Panel> {
         child: Column(
           children: [
             HeaderPanel(
-              url: widget.hueca?.photo,
+              url: widget.hueca?.photo ?? "",
               hueca: widget.hueca,
             ),
             BodyPanel(hueca: widget.hueca),
