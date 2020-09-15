@@ -3,7 +3,7 @@ import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 
-class RaatingService {
+class RatingService {
   static Dio _dio = Dio(BaseOptions(
       baseUrl: "http://localhost:8000/api",
       contentType: "application/json",
@@ -55,6 +55,25 @@ class RaatingService {
     } on DioError catch (ex) {
       print(ex.response.data);
       return null;
+    }
+  }
+
+  static Future<List<Rating>> getRatingsByMenu(int id) async {
+    List<Rating> res = List<Rating>();
+    try {
+      final response = await _dio.get("/ratings/hueca/${id.toString()}");
+      if (response.data != "") {
+        for (var dat in response.data) {
+          res.add(Rating.fromJsonUser(dat));
+        }
+        return res;
+      }
+      res.add(Rating.zero());
+      return res;
+    } on DioError catch (ex) {
+      print(ex.response.data);
+      res.add(Rating.zero());
+      return res;
     }
   }
 }

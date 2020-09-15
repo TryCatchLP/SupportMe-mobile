@@ -49,10 +49,10 @@ class Session {
         _dio.options.headers = Session.instance.authorization;
         final response = await _dio.get('/profile');
         if (response.statusCode == 200) {
-          Map<String, dynamic> data = response.data;
+          Map<String, dynamic> data = response.data["success"];
           //return response()->json(['success' => $user], $this-> successStatus)
           //Por eso accedo al success 
-          return User.fromJson(data["success"]);
+          return User.fromJson(data);
         }
         return User.zero();
       } on DioError catch (ex) {
@@ -69,8 +69,6 @@ class Session {
         _dio.options.headers = Session.instance.authorization;
         final response = await _dio.put('/profile', data: user.toJson());
         if (response.statusCode == 200) {
-          //return response()->json(['success' => $user], $this-> successStatus)
-          //Por eso accedo al success 
           return true;
         }
         return false;

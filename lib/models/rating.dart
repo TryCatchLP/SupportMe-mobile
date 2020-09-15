@@ -5,6 +5,7 @@ class Rating {
   int huecaid;
   String comentario;
   String huecaname;
+  String username;
 
   Rating(
       {this.id,
@@ -12,7 +13,8 @@ class Rating {
       this.userid,
       this.huecaid,
       this.comentario,
-      this.huecaname});
+      this.huecaname,
+      this.username});
 
   factory Rating.fromJson(Map<String, dynamic> json) {
     return Rating(
@@ -25,6 +27,10 @@ class Rating {
 
   factory Rating.fromJsonDetail(Map<String, dynamic> json) {
     return Rating.fromJson(json)..huecaname = json["huecaname"];
+  }
+
+  factory Rating.fromJsonUser(Map<String, dynamic> json) {
+    return Rating.fromJson(json)..username = json["username"];
   }
 
   factory Rating.zero() {

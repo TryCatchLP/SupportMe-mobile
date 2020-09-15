@@ -31,4 +31,23 @@ class HuecaService {
       return null;
     }
   }
+
+  static Future<List<Menu>> getMenuHuecas(int id) async {
+    List<Menu> res = List<Menu>();
+    try {
+      final response = await _dio.get("/menu/hueca/${id.toString()}");
+      if (response.data != "") {
+        for (var dat in response.data) {
+          res.add(Menu.fromJson(dat));
+        }
+        return res;
+      }
+      res.add(Menu.zero());
+      return res;
+    } on DioError catch (ex) {
+      print(ex.response.data);
+      res.add(Menu.zero());
+      return res;
+    }
+  }
 }

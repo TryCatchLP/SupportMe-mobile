@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/user.dart';
+import 'package:supportme/theme/theme.dart';
 import 'package:supportme/views/user_ratings.dart';
 
 class ProfileView extends StatefulWidget {
+  final Function() logOut;
+
+  ProfileView({Key key, this.logOut}) : super(key: key);
   @override
   _ProfileViewState createState() => _ProfileViewState();
 }
@@ -32,9 +36,7 @@ class _ProfileViewState extends State<ProfileView> {
             child: Center(child: CircularProgressIndicator())));
 
     Session.instance.profile().then((value) {
-      
-      setState(
-          () => {
+      setState(() => {
             idCtrl.text = value.id.toString(),
             usernameCtrl.text = value.username,
             nombreCtrl.text = value.firstname,
@@ -76,24 +78,23 @@ class _ProfileViewState extends State<ProfileView> {
         child: CircularProgressIndicator(),
       ),
       barrierDismissible: false,
-    ) ;
+    );
 
     User user = User(
-      id: int.tryParse(idCtrl.text),//Ya no es necesario
-      username: usernameCtrl.text,
-      firstname: nombreCtrl.text,
-      lastname: apellidoCtrl.text,
-      address: direccionCtrl.text,
-      phone: telefonoCtrl.text,
-      email: correoCtrl.text
-    );
+        id: int.tryParse(idCtrl.text),
+        username: usernameCtrl.text,
+        firstname: nombreCtrl.text,
+        lastname: apellidoCtrl.text,
+        address: direccionCtrl.text,
+        phone: telefonoCtrl.text,
+        email: correoCtrl.text);
     final res = await Session.instance.profileUpdate(user);
     Navigator.pop(context);
     setState(() {
       _activado = !_activado;
     });
 
-    if (res != false) {  
+    if (res != false) {
       Fluttertoast.showToast(
         msg: "Perfil actualizado exitosamente!",
       );
@@ -113,7 +114,7 @@ class _ProfileViewState extends State<ProfileView> {
         title: Text('Perfil'),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: _activado? Icon(Icons.cancel) : Icon(Icons.edit),
             onPressed: () {
               setState(() {
                 _activado = !_activado;
@@ -184,14 +185,12 @@ class _ProfileViewState extends State<ProfileView> {
           SizedBox(height: 130.0),
           FlatButton(
             onPressed: () {
-              if (_formKey.currentState.validate()) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserRatingsView(),
-                    ));
-                // Process data.
-              }
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserRatingsView(),
+                  ));
+              // Process data.
             },
             child: Row(
               children: [
@@ -204,11 +203,29 @@ class _ProfileViewState extends State<ProfileView> {
             color: Colors.orangeAccent,
           ),
           FlatButton(
-            onPressed: () {
-              if (_formKey.currentState.validate()) {
-                _submit();
-                // Process data.
-              }
+            onPressed: () async {
+              showDialog(
+                context: context,
+                child: AlertDialog(
+                  title: Text("Cerrar sesión"),
+                  actions: [
+                    RaisedButton(
+                      color: AppTheme.primary,
+                      child: Text("Aceptar"),
+                      onPressed: () async => {
+                        await Session.instance.logout(),
+                        Navigator.of(context).pop(),
+                        this.widget.logOut(),
+                      },
+                    ),
+                    RaisedButton(
+                      color: AppTheme.primary,
+                      child: Text("Cancelar"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    )
+                  ],
+                )
+              );
             },
             child: Row(
               children: [

@@ -48,14 +48,18 @@ class _HomeState extends State<Home> {
       case 3:
         if (Session.instance.isAuthenticate) {
           setState(() {
-            _widget = ProfileView();
+            _widget = ProfileView(
+              logOut: () => _onItemTap(0),
+            );
           });
         } else {
           bool login = await Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => Login()));
           if(login ?? false){
             setState(() {
-            _widget = ProfileView();
+            _widget = ProfileView(
+              logOut: () => _onItemTap(0),
+            );
             });
           }
         }

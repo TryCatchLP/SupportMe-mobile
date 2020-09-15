@@ -23,7 +23,7 @@ class _UserRatingsViewState extends State<UserRatingsView> {
         ),
         backgroundColor: Colors.white,
         body: FutureBuilder(
-            future: RaatingService.getUserRatings(),
+            future: RatingService.getUserRatings(),
             builder: (context, AsyncSnapshot<List<Rating>> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.separated(
@@ -63,14 +63,14 @@ class RatingItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                  Container(
-                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.2),
-                    child: Text(
-                      rating.huecaname,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.2),
+                      child: Text(
+                        rating.huecaname,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ]..addAll(List.generate(
+                  ]..addAll(List.generate(
                         5,
                         _buildStars,
                       ))),

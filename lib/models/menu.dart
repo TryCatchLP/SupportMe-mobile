@@ -11,10 +11,14 @@ class Menu {
   String ingredients;
   double price;
 
+  factory Menu.zero() {
+    return Menu(id: 0, title: "", ingredients: "", price: 0.0);
+  }
+
   factory Menu.fromJson(Map<String, dynamic> json) => Menu(
-        id: json["id"],
-        title: json["title"],
-        ingredients: json["ingredients"],
+        id: json["menu"]["id"],
+        title: json["menu"]["title"],
+        ingredients: json["menu"]["ingredients"],
         price: json["price"].toDouble()
       );
 

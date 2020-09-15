@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/models/rating.dart';
 import 'package:supportme/services/rating_service.dart';
@@ -42,8 +41,8 @@ class _RatingViewState extends State<RatingView> {
           child: CircularProgressIndicator(),
         ));
     final res = rating.id == null
-        ? await RaatingService.post(rating)
-        : await RaatingService.update(rating);
+        ? await RatingService.post(rating)
+        : await RatingService.update(rating);
     if (res != null) {
       if (rating.id != null) {
         widget.hueca.stars -= oldStars;
@@ -82,7 +81,7 @@ class _RatingViewState extends State<RatingView> {
               height: 15,
             ),
             FutureBuilder(
-                future: RaatingService.getUserRatingHueca(widget.hueca),
+                future: RatingService.getUserRatingHueca(widget.hueca),
                 builder: (context, AsyncSnapshot<Rating> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     Rating value = snapshot.data;

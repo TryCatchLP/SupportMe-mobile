@@ -8,8 +8,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:supportme/auth/session.dart';
 import 'package:supportme/models/hueca.dart';
+import 'package:supportme/models/menu.dart';
+import 'package:supportme/models/rating.dart';
 import 'package:supportme/services/hueca_service.dart';
 import 'package:supportme/services/location_service.dart';
+import 'package:supportme/services/rating_service.dart';
 import 'package:supportme/theme/theme.dart';
 
 import 'Rating.dart';
@@ -219,7 +222,6 @@ class Panel extends StatefulWidget {
 }
 
 class _PanelState extends State<Panel> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -270,9 +272,106 @@ class BodyPanel extends StatelessWidget {
             ),
             buildRatings(context),
           ],
-        )
+        ),
+        FutureBuilder(
+          future: HuecaService.getMenuHuecas(hueca.id),
+          builder: (context, AsyncSnapshot<List<Menu>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return buildMenu(snapshot.data);
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: CircularProgressIndicator( backgroundColor: Colors.black ),
+                ),
+              );
+            }
+          },
+        ),
+        FutureBuilder(
+          future: RatingService.getRatingsByMenu(hueca.id),
+          builder: (context, AsyncSnapshot<List<Rating>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return buildRating(snapshot.data);
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: CircularProgressIndicator( backgroundColor: Colors.black ),
+                ),
+              );
+            }
+          },
+        ),
       ],
     ));
+  }
+
+  Widget buildMenu(List<Menu> lista) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [ 
+        Text("Menu", style: TextStyle(fontWeight: FontWeight.bold),)
+      ]..addAll(lista.map(_buildMenu).toList()),
+    );
+  }
+
+  Widget _buildMenu(Menu menu) {
+  return new ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('${menu.title}'),
+          Text('\$${menu.price}'),
+        ],
+      ),
+      subtitle: new Text('Ingrediente: ${menu.ingredients}' , overflow: TextOverflow.ellipsis,),
+      leading: new Icon(Icons.fastfood),
+  );
+}
+
+  Widget buildRating(List<Rating> lista) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [ 
+        Text("Comentarios", style: TextStyle(fontWeight: FontWeight.bold),)
+      ]..addAll(lista.map(_buildRating).toList()),
+    );
+  }
+
+  Widget _buildRating(Rating rating) {
+    return new ListTile(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('${rating.username}'),
+            Row(
+              children: [
+                Text('${rating.stars}.0'),
+                Stack(
+                  children: [
+                    Icon(
+                      Icons.star,
+                      color: Color(0xFFDFFF1A),
+                      size: 20,
+                    ),
+                    Icon(
+                      Icons.star_border,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        subtitle: new Text('${rating.comentario}' , overflow: TextOverflow.ellipsis,),
+        leading: new Icon(Icons.comment),
+    );
   }
 
   RichText buildDirection() {
