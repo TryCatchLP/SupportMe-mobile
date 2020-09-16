@@ -1,9 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supportme/models/hueca.dart';
 import 'package:supportme/theme/theme.dart';
 import 'package:supportme/views/menu.dart';
 
+import 'shared/capture.dart';
+
 class HuecaView extends StatefulWidget {
+  final LatLng latLng;
+
+  const HuecaView({Key key, this.latLng}) : super(key: key);
   @override
   _HuecaViewState createState() => _HuecaViewState();
 }
@@ -18,9 +27,16 @@ class _HuecaViewState extends State<HuecaView> {
   TextEditingController telefonoCtrl = new TextEditingController();
   TextEditingController descripcionCtrl = new TextEditingController();
   TextEditingController horarioCtrl = new TextEditingController();
+  Image _image;
+  File image;
+  GlobalKey<ScaffoldState> _scaff = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
+    if(widget.latLng != null){
+      latitudCtrl.text = "${widget.latLng.latitude}";
+      longitudCtrl.text = "${widget.latLng.longitude}";
+    } 
     super.initState();
   }
 
@@ -44,7 +60,7 @@ class _HuecaViewState extends State<HuecaView> {
         lat: double.parse(latitudCtrl.text),
         lng: double.parse(longitudCtrl.text),
         address: direccionCtrl.text,
-        photo: "C://",
+        photo: image.path,
         phone: telefonoCtrl.text,
         //schedule: horarioCtrl.text,
         stars: 0,
@@ -54,7 +70,7 @@ class _HuecaViewState extends State<HuecaView> {
     bool aceptado = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => MenuView(hueca: hueca)));
 
-    if(aceptado != null){
+    if (aceptado != null) {
       nombreCtrl.text = "";
       direccionCtrl.text = "";
       latitudCtrl.text = "";
@@ -72,9 +88,29 @@ class _HuecaViewState extends State<HuecaView> {
     return null;
   }
 
+  _takePicture() async {
+    _scaff.currentState.showSnackBar(SnackBar(
+      content: ActionCapture(onCapture: (file) async {
+        if (file != null) {
+          setState(() {
+            image = file;
+            _image = Image.file(file);
+          });
+        } else {
+          setState(() {
+            image = null;
+            _image = null;
+          });
+          Fluttertoast.showToast(msg: "No se pudo cargar la imagen");
+        }
+      }),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaff,
       appBar: AppBar(
         title: Text('Registrar Hueca'),
       ),
@@ -82,8 +118,25 @@ class _HuecaViewState extends State<HuecaView> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(40.0),
+          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
           children: <Widget>[
+            Center(
+              child: Container(
+                color: Color(0xFFC4C4C4),
+                height: 100,
+                width: 100,
+                child: _image,
+              ),
+            ),
+            Center(
+              child: FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                child: Text("Cargar imagen"),
+                onPressed: _takePicture,
+                color: Color(0x99C9FF30),
+              ),
+            ),
             CustomField(
               hintText: 'Nombre',
               icon: Icons.person_outline,
@@ -165,7 +218,13 @@ class _HuecaViewState extends State<HuecaView> {
               color: AppTheme.primary,
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  _submit();
+                  if (image != null) {
+                    _submit();
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "No ha seleccionado una imágen",
+                        toastLength: Toast.LENGTH_SHORT);
+                  }
                   // Process data.
                 }
               },

@@ -8,10 +8,15 @@ class HuecaService {
 
   static Future<Map<String, dynamic>> post(Hueca hueca, List<Menu> menu) async {
     try {
-      final response = await _dio.post("/huecas", data: {
+      
+      String fileName = hueca.photo.split('/').last;
+      FormData formData = FormData.fromMap({
+        "photo": await MultipartFile.fromFile(hueca.photo, filename: fileName),
         "hueca": hueca.toJson(),
         "menues": menu.map((item) => item.toJson()).toList()
       });
+
+      final response = await _dio.post("/huecas", data: formData);
       return response.data;
     } on DioError catch (ex) {
       print(ex.response.data);
