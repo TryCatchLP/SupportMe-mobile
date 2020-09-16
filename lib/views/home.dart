@@ -45,7 +45,8 @@ class _HomeState extends State<Home> {
         setState(() {
           _widget = BuscarView(
             onClose: (hueca) {
-              _onItemTap(0, latLng: LatLng(hueca.lat, hueca.lng));
+              if(hueca != null)
+                _onItemTap(0, latLng: LatLng(hueca.lat, hueca.lng));
             },
           );
         });
