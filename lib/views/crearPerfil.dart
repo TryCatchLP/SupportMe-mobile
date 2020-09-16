@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:supportme/models/user.dart';
 import 'package:supportme/auth/session.dart';
 
@@ -11,16 +12,7 @@ import 'package:supportme/auth/session.dart';
 class CrearPerfilView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Perfil',
-      theme: ThemeData(
-        primaryIconTheme: IconThemeData(
-          color: Colors.black,
-        ),
-      ),
-      home: CrearPerfil(),
-    );
+    return CrearPerfil();
   }
 }
 
@@ -30,17 +22,23 @@ class CrearPerfil extends StatefulWidget {
 
 class CrearPerfilState extends State<CrearPerfil> {
   CrearPerfilState({Key key}) : super();
+  bool _obscureTextpass;
+  bool _obscureTextpass2;
   final _claveFormulario = GlobalKey<FormState>();
-  final TextEditingController correo = TextEditingController();
-  final TextEditingController nombre = TextEditingController();
-  final TextEditingController apellido = TextEditingController();
-  final TextEditingController contrasena = TextEditingController();
-  final TextEditingController validarPass = TextEditingController();
-  final TextEditingController id = TextEditingController();
-  
+  TextEditingController usernameCtrl = new TextEditingController();
+  TextEditingController nombreCtrl = new TextEditingController();
+  TextEditingController apellidoCtrl = new TextEditingController();
+  TextEditingController correoCtrl = new TextEditingController();
+  TextEditingController direccionCtrl = new TextEditingController();
+  TextEditingController telefonoCtrl = new TextEditingController();
+  TextEditingController passCtrl = new TextEditingController();
+  TextEditingController passCompCtrl = new TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    _obscureTextpass = true;
+    _obscureTextpass2 = true;
   }
 
   @override
@@ -50,172 +48,258 @@ class CrearPerfilState extends State<CrearPerfil> {
 
   _submit() async {
     showDialog(
-        context: context,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ));
-    User user = User(
-        id: int.tryParse(id.text),
-        username: nombre.text,
-        name: nombreCtrl.text,
-        lastname: nombreCtrl.text,
-        address: " ",
-        phone: 0,
-        email: nombreCtrl.text,
+      context: context,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
     );
-    final res = await Session.instance.profileCreated(user,password);
-    Navigator.pop(context);
-    //bool aceptado = await Navigator.push(context),
-        //MaterialPageRoute(builder: (context) => MenuView(user: user))
-      
 
-    //if(aceptado != null){
-      //correo.text = "";
-      //nombre.text = "";
-      //apellido.text = "";
-      //contrasena.text = "";
-      //validarPass.text = "";
-    //}
+    User user = User(
+        username: usernameCtrl.text,
+        firstname: nombreCtrl.text,
+        lastname: apellidoCtrl.text,
+        address: direccionCtrl.text,
+        phone: telefonoCtrl.text,
+        email: correoCtrl.text);
+
+    final res = await Session.instance.profileCreated(user, passCtrl.text, passCompCtrl.text);
+    Navigator.pop(context);
+
+    if (res != false) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: "Usuario creado y logueado exitosamente!",
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error al crear perfil!",
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text("Crear Cuenta", style:(TextStyle(color: Colors.black))),
-        backgroundColor: Colors.white,
-        elevation: 0.7, 
+        title: Text("Crear Cuenta"),
       ),
       backgroundColor: Colors.white,
-      body: Container(
-      child: Column( children: <Widget>[
-        SizedBox(height: 25.0),
-        Container( child: Column( children:  <Widget>[
-          Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSzTRhI_GwJg_lQkMzDXcZlyOTyrSFCb3vY2A&usqp=CAU", width: 70)
+      body: ListView(
+        children: [
+          Column(children: <Widget>[
+            SizedBox(height: 25.0),
+            Container(
+              child: Column(children: <Widget>[
+                Image.network(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSzTRhI_GwJg_lQkMzDXcZlyOTyrSFCb3vY2A&usqp=CAU",
+                    width: 70)
+              ]),
+            ),
+            Form(
+              key: _claveFormulario,
+              child: ListView(shrinkWrap: true, children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Ingrese un nombre de usuario';
+                      }
+                      return null;
+                    },
+                    controller: usernameCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Nombre de usuario',
+                      labelText: 'Nombre de usuario',
+                      suffixIcon: Icon(Icons.mail),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    keyboardType: TextInputType.emailAddress,
+                    validator: validateEmail,
+                    controller: correoCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Correo',
+                      labelText: 'Correo',
+                      suffixIcon: Icon(Icons.mail),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Ingrese su nombre';
+                      }
+                      return null;
+                    },
+                    controller: nombreCtrl,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'Nombre',
+                      labelText: 'Nombre',
+                      suffixIcon: Icon(Icons.perm_identity),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Ingrese su apellido';
+                      }
+                      return null;
+                    },
+                    controller: apellidoCtrl,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'Apellido',
+                      labelText: 'Apellido',
+                      suffixIcon: Icon(Icons.person),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: telefonoCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Teléfono',
+                      labelText: 'Teléfono',
+                      suffixIcon: Icon(Icons.phone),
+                    ),
+                    maxLength: 10,
+                    validator: validateMobile,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Ingrese su dirección';
+                      }
+                      return null;
+                    },
+                    controller: direccionCtrl,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'Dirección',
+                      labelText: 'Dirección',
+                      suffixIcon: Icon(Icons.pin_drop),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Ingrese una contraseña';
+                      } else if (value.length < 6)
+                        return 'Contraseña muy corta.';
+                      return null;
+                    },
+                    obscureText: _obscureTextpass,
+                    controller: passCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Contraseña',
+                      labelText: 'Contraseña',
+                      suffixIcon: IconButton(
+                        icon: _obscureTextpass
+                            ? Icon(Icons.lock_outline)
+                            : Icon(Icons.lock_open),
+                        onPressed: () {
+                          setState(() {
+                            _obscureTextpass = !_obscureTextpass;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 1, 60, 8),
+                  child: TextFormField(
+                    obscureText: _obscureTextpass2,
+                    validator: validatePassword,
+                    controller: passCompCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Confirmar contraseña',
+                      labelText: 'Confirmar contraseña',
+                      suffixIcon: IconButton(
+                        icon: _obscureTextpass2
+                            ? Icon(Icons.lock_outline)
+                            : Icon(Icons.lock_open),
+                        onPressed: () {
+                          setState(() {
+                            _obscureTextpass2 = !_obscureTextpass2;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(60, 8, 60, 8),
+                  child: RaisedButton(
+                    color: Color(0xFFF1D57F),
+                    onPressed: () {
+                      if (_claveFormulario.currentState.validate()) {
+                        _submit();
+                      }
+                    },
+                    child: Text('REGISTRARSE'),
+                  ),
+                ),
+              ]),
+            )
           ]),
-        ),
-        Form(
-        key: _claveFormulario,
-        child: ListView(shrinkWrap: true, children: <Widget>[
-          
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
-            child: TextFormField(
-              keyboardType: TextInputType.emailAddress,
-              validator:validateEmail,
-              controller:correo,
-              decoration: InputDecoration(
-                hintText: 'Correo',
-                labelText: 'Correo',
-                suffixIcon: Icon(Icons.mail),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
-            child: TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Ingrese su nombre';
-                }
-                return null;
-              },
-              controller: nombre,
-              decoration: InputDecoration(
-                hintText: 'Nombre',
-                labelText: 'Nombre',
-                suffixIcon: Icon(Icons.perm_identity),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
-            child: TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Ingrese su apellido';
-                }
-                return null;
-              },
-              controller: apellido,
-              decoration: InputDecoration(
-                hintText: 'Apellido',
-                labelText: 'Apellido',
-                suffixIcon: Icon(Icons.person),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 1, 60, 1),
-            child: TextFormField(
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Ingrese una contraseña';
-                }
-                return null;
-              },
-              obscureText: true,
-              controller: contrasena,
-              decoration: InputDecoration(
-                hintText: 'Contraseña',
-                labelText: 'Contraseña',
-                suffixIcon: Icon(Icons.lock),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 1, 60, 8),
-            child: TextFormField(
-              obscureText: true,
-              validator:validatePassword,
-              controller: validarPass,
-              decoration: InputDecoration(
-                hintText: 'Confirmar contraseña',
-                labelText: 'Confirmar contraseña',
-                suffixIcon: Icon(Icons.lock_open),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(60, 8, 60, 8),
-            child: RaisedButton(
-              color: Color(0xFFF1D57F),
-              onPressed: () {
-                if (_claveFormulario.currentState.validate()) {
-                  _submit();
-                }
-              },
-              child: Text('REGISTRARSE'),
-            ),),
-        ]),
-      )
-      ])),
+        ],
+      ),
     );
   }
+
   String validatePassword(String value) {
-   print("valorrr $value passsword ${contrasena.text}");
-   if (value != contrasena.text) {
-     return "Las contraseñas no coinciden";
-   }
-   return null;
- }
+    if (value != passCtrl.text) {
+      return "Las contraseñas no coinciden";
+    }
+    return null;
+  }
 }
 
 String validateEmail(String value) {
-   String pattern =
-       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-   RegExp regExp = new RegExp(pattern);
-   if (value.length == 0) {
-     return "El correo es necesario";
-   } else if (!regExp.hasMatch(value)) {
-     return "Correo invalido";
-   } else {
-     return null;
-   }
- }
+  String pattern =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  RegExp regExp = new RegExp(pattern);
+  if (value.length == 0) {
+    return "El correo es necesario";
+  } else if (!regExp.hasMatch(value)) {
+    return "Correo invalido";
+  } else {
+    return null;
+  }
+}
+
+String validateMobile(String value) {
+  String pattern = r'(^[0-9]*$)';
+  RegExp regExp = new RegExp(pattern);
+  if (value.length == 0) {
+    return "El telefono es necesario.";
+  } else if (!regExp.hasMatch(value)) {
+    return "Teléfono invalido.";
+  } else if (value.length != 10) {
+    return "El numero debe tener 10 digitos";
+  }
+  return null;
+}

@@ -26,7 +26,11 @@ class _HomeState extends State<Home> {
 
   _onItemTap(int index, {LatLng latLng}) async {
     setState(() {
-      if (index == 0 || index == 2 || (index == 3 && Session.instance.isAuthenticate)) _bottomNavigationIndex = index;
+      if (index == 0 ||
+          index == 1 ||
+          index == 2 ||
+          (index == 3 && Session.instance.isAuthenticate))
+        _bottomNavigationIndex = index;
     });
     switch (index) {
       case 0:
@@ -37,12 +41,15 @@ class _HomeState extends State<Home> {
         });
         break;
       case 1:
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => BuscarView()));
+        setState(() {
+          _widget = BuscarView();
+        });
         break;
       case 2:
         setState(() {
-          _widget = HuecaView(latLng: latLng,);
+          _widget = HuecaView(
+            latLng: latLng,
+          );
         });
         break;
       case 3:
@@ -55,11 +62,11 @@ class _HomeState extends State<Home> {
         } else {
           bool login = await Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => Login()));
-          if(login ?? false){
+          if (login ?? false) {
             setState(() {
-            _widget = ProfileView(
-              logOut: () => _onItemTap(0),
-            );
+              _widget = ProfileView(
+                logOut: () => _onItemTap(0),
+              );
             });
           }
         }
@@ -102,8 +109,7 @@ class BottomMenu extends StatelessWidget {
               icon: Icon(Icons.home), title: Text("Inicio")),
           BottomNavigationBarItem(
               icon: Icon(Icons.search), title: Text("Buscar")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add), title: Text("Nuevo")),
+          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Nuevo")),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text("Perfil"))
         ]);

@@ -81,13 +81,15 @@ class _ProfileViewState extends State<ProfileView> {
     );
 
     User user = User(
-        id: int.tryParse(idCtrl.text),
-        username: usernameCtrl.text,
-        firstname: nombreCtrl.text,
-        lastname: apellidoCtrl.text,
-        address: direccionCtrl.text,
-        phone: telefonoCtrl.text,
-        email: correoCtrl.text);
+      id: int.tryParse(idCtrl.text),
+      username: usernameCtrl.text,
+      firstname: nombreCtrl.text,
+      lastname: apellidoCtrl.text,
+      address: direccionCtrl.text,
+      phone: telefonoCtrl.text,
+      email: correoCtrl.text
+    );
+    
     final res = await Session.instance.profileUpdate(user);
     Navigator.pop(context);
     setState(() {
@@ -97,13 +99,14 @@ class _ProfileViewState extends State<ProfileView> {
     if (res != false) {
       Fluttertoast.showToast(
         msg: "Perfil actualizado exitosamente!",
+        toastLength: Toast.LENGTH_LONG,
       );
     } else {
       Fluttertoast.showToast(
         msg: "Error al actualizar perfil!",
+        toastLength: Toast.LENGTH_LONG,
       );
     }
-    //Navigator.push(context, MaterialPageRoute(builder: (context) => MenuView(hueca: hueca)));
   }
 
   @override

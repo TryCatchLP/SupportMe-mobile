@@ -7,20 +7,9 @@ import 'package:supportme/models/hueca.dart';
 import 'package:supportme/services/hueca_service.dart';
 
 class BuscarView extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Buscar',
-      theme: ThemeData(
-        
-        primaryIconTheme: IconThemeData(
-    color: Colors.black,
-  )
-      ),
-      home: Buscar(),
-    );
+    return Buscar();
   }
 }
 
@@ -32,23 +21,24 @@ class Buscar extends StatefulWidget {
 }
 
 class _HomePageState extends State<Buscar> {
-  List<Hueca> huecas= List();
+  List<Hueca> huecas = List();
   @override
-  void initState(){
-    HuecaService.getHuecas().then((List<Hueca> values){
-      setState((){
-        huecas=values;
+  void initState() {
+    HuecaService.getHuecas().then((List<Hueca> values) {
+      setState(() {
+        huecas = values;
       });
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         //backgroundColor: PrimaryColor,
         actions: <Widget>[
-         IconButton(
+          IconButton(
             onPressed: () {
               showSearch(context: context, delegate: Search(widget.list));
             },
@@ -56,114 +46,96 @@ class _HomePageState extends State<Buscar> {
           ),
         ],
         centerTitle: false,
-        title: Text('Buscar', style:(TextStyle(color: Color(0xFFC4C4C4)))),
+        title: Text('Buscar', style: (TextStyle(color: Color(0xFFC4C4C4)))),
         backgroundColor: Colors.white,
-        elevation: 0.7,    
+        elevation: 0.7,
       ),
       body: Container(
-      child: Column(
-         children: <Widget>[
-           Container(
-            child:Row(
-              children:  <Widget>[
-                SizedBox(height: 40.0),
-                SizedBox(width: 20.0),
-                Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQCwoP17v-18qx6u_le4xC0Njb98HbCJ5ZT6w&usqp=CAU", width: 15),
-                SizedBox(width: 10.0),
-                Text("Filtrar", style: TextStyle(fontWeight: FontWeight.bold)),
-              ]
-            )
-          ),
-        Container(
-          margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10),
-          decoration:BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.red, width: 1.0,)),
-          ),
-          
-            child:Row(
-              children:  <Widget>[
-                Text("RECOMENDACIONES", style:(TextStyle(color: Colors.red, fontSize: 15))),
-              ]
-            )
-          ),
+        child: Column(children: <Widget>[
+          Container(
+              child: Row(children: <Widget>[
+            SizedBox(height: 40.0),
+            SizedBox(width: 20.0),
+            Image.network(
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQCwoP17v-18qx6u_le4xC0Njb98HbCJ5ZT6w&usqp=CAU",
+                width: 15),
+            SizedBox(width: 10.0),
+            Text("Filtrar", style: TextStyle(fontWeight: FontWeight.bold)),
+          ])),
+          Container(
+              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10),
+              decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+                  color: Colors.red,
+                  width: 1.0,
+                )),
+              ),
+              child: Row(children: <Widget>[
+                Text("RECOMENDACIONES",
+                    style: (TextStyle(color: Colors.red, fontSize: 15))),
+              ])),
           Expanded(
             child: ListView.builder(
               itemBuilder: _builder,
-              itemCount: huecas.length,),
+              itemCount: huecas.length,
+            ),
           )
         ]),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-        
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-           items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home), title: Text("Inicio")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search), title: Text("Buscar")),
-          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Nuevo")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), title: Text("Perfil"))
-        ],
-        ),
+      ),
     );
-     
   }
-  Widget _builder(context, i){
-  return Container(
-             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20),
-             decoration:BoxDecoration(
-               color: Color(0xFFF1D57F),
-              border: Border.all(color: Color(0xFFF1D57F),width: 1.0,),
-              ),
-            
-            child:Row(
-              children:  <Widget>[
-                SizedBox(height: 25.0),
-                SizedBox(width: 12.0), 
-                Image.network(
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU", 
-                  width: 70),
-                SizedBox(width: 10.0),
-                Text(
-                  "${huecas[i].name}\n${huecas[i].descrip}\nAbierto\nLunes-Viernes: 07:30-16:00\nS�bado: 8:00-15:00", 
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize:11)),
-              ]
-            )
-          );
-}
-Widget vista() {
-     return Container(
-      child: Column(
-         children: <Widget>[
-           Container(
-            child:Row(
-              children:  <Widget>[
-                SizedBox(height: 40.0),
-                SizedBox(width: 20.0),
-                Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQCwoP17v-18qx6u_le4xC0Njb98HbCJ5ZT6w&usqp=CAU", width: 15),
-                SizedBox(width: 10.0),
-                Text("Filtrar", style: TextStyle(fontWeight: FontWeight.bold)),
-              ]
-            )
+
+  Widget _builder(context, i) {
+    return Container(
+        margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20),
+        decoration: BoxDecoration(
+          color: Color(0xFFF1D57F),
+          border: Border.all(
+            color: Color(0xFFF1D57F),
+            width: 1.0,
           ),
-        Container(
+        ),
+        child: Row(children: <Widget>[
+          SizedBox(height: 25.0),
+          SizedBox(width: 12.0),
+          Image.network(
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSnekR0L0HHNjpeva06BBuq1oH44lplGESXNQ&usqp=CAU",
+              width: 70),
+          SizedBox(width: 10.0),
+          Text(
+              "${huecas[i].name}\n${huecas[i].descrip}\nAbierto\nLunes-Viernes: 07:30-16:00\nS�bado: 8:00-15:00",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+        ]));
+  }
+
+  Widget vista() {
+    return Container(
+        child: Column(children: <Widget>[
+      Container(
+          child: Row(children: <Widget>[
+        SizedBox(height: 40.0),
+        SizedBox(width: 20.0),
+        Image.network(
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQCwoP17v-18qx6u_le4xC0Njb98HbCJ5ZT6w&usqp=CAU",
+            width: 15),
+        SizedBox(width: 10.0),
+        Text("Filtrar", style: TextStyle(fontWeight: FontWeight.bold)),
+      ])),
+      Container(
           margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10),
-          decoration:BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.red, width: 1.0,)),
+          decoration: BoxDecoration(
+            border: Border(
+                bottom: BorderSide(
+              color: Colors.red,
+              width: 1.0,
+            )),
           ),
-          
-            child:Row(
-              children:  <Widget>[
-                Text("RECOMENDACIONES", style:(TextStyle(color: Colors.red, fontSize: 15))),
-              ]
-            )
-          ),
-        ])
-      
-    );
+          child: Row(children: <Widget>[
+            Text("RECOMENDACIONES",
+                style: (TextStyle(color: Colors.red, fontSize: 15))),
+          ])),
+    ]));
   }
 }
 
@@ -185,7 +157,7 @@ class Search extends SearchDelegate {
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
-        close(context,null);
+        close(context, null);
       },
     );
   }
@@ -208,6 +180,6 @@ class Search extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-     return Column();
+    return Column();
   }
 }
