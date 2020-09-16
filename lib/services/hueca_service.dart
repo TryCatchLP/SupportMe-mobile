@@ -8,7 +8,6 @@ class HuecaService {
 
   static Future<Map<String, dynamic>> post(Hueca hueca, List<Menu> menu) async {
     try {
-      
       String fileName = hueca.photo.split('/').last;
       FormData formData = FormData.fromMap({
         "photo": await MultipartFile.fromFile(hueca.photo, filename: fileName),
@@ -24,12 +23,28 @@ class HuecaService {
     }
   }
 
-  static Future<List<Hueca>> getHuecas() async {
+  static Future<List<Hueca>> getHuecas({String query}) async {
     try {
       final response = await _dio.get("/huecas");
       List<Hueca> res = List<Hueca>();
       for (var dat in response.data) {
-        res.add(Hueca.fromJson(dat));
+        if (query == null)
+          res.add(Hueca.fromJson(dat));
+        else {
+          Hueca hueca = Hueca.fromJson(dat);
+          if (query.trim()
+                    .toLowerCase()
+                    .allMatches(hueca.name.toLowerCase())
+                    .length >
+                  0 ||
+              query.trim()
+                    .toLowerCase()
+                    .allMatches(hueca.descrip.toLowerCase())
+                    .length >
+                  0) {
+            res.add(hueca);
+          }
+        }
       }
       return res;
     } catch (_) {

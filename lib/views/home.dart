@@ -36,13 +36,18 @@ class _HomeState extends State<Home> {
       case 0:
         setState(() {
           _widget = MapView(
+            initial: latLng,
             onAddHueca: (latLng) => _onItemTap(2, latLng: latLng),
           );
         });
         break;
       case 1:
         setState(() {
-          _widget = BuscarView();
+          _widget = BuscarView(
+            onClose: (hueca) {
+              _onItemTap(0, latLng: LatLng(hueca.lat, hueca.lng));
+            },
+          );
         });
         break;
       case 2:

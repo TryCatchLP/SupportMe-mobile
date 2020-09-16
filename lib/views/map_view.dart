@@ -20,8 +20,9 @@ import 'login.dart';
 
 class MapView extends StatefulWidget {
   final Function(LatLng) onAddHueca;
+  final LatLng initial;
 
-  MapView({Key key, this.onAddHueca}) : super(key: key);
+  MapView({Key key, this.onAddHueca, this.initial}) : super(key: key);
   @override
   _MapViewState createState() => _MapViewState();
 }
@@ -198,6 +199,9 @@ class _MapViewState extends State<MapView> {
             if (this.mounted) {
               _controller.complete(controller);
               _addMarkers(await HuecaService.getHuecas());
+              if (this.widget.initial != null) {
+                _zoomMap(widget.initial);
+              }
             }
           },
         ),
