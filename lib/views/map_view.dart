@@ -224,10 +224,8 @@ class Panel extends StatefulWidget {
 }
 
 class _PanelState extends State<Panel> {
-
-  
   final url = "https://pbs.twimg.com/media/D38wwCmW4AEp8lo.jpg";
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -240,7 +238,12 @@ class _PanelState extends State<Panel> {
                   : url,
               hueca: widget.hueca,
             ),
-            BodyPanel(hueca: widget.hueca),
+            BodyPanel(
+              hueca: widget.hueca,
+              onClose: () {
+                setState(() {});
+              },
+            ),
           ],
         ),
       ),
@@ -249,10 +252,9 @@ class _PanelState extends State<Panel> {
 }
 
 class BodyPanel extends StatelessWidget {
-  const BodyPanel({
-    Key key,
-    @required this.hueca,
-  }) : super(key: key);
+  final Function onClose;
+  const BodyPanel({Key key, @required this.hueca, this.onClose})
+      : super(key: key);
 
   final Hueca hueca;
 
@@ -290,7 +292,8 @@ class BodyPanel extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Center(
-                  child: CircularProgressIndicator( backgroundColor: Colors.black ),
+                  child:
+                      CircularProgressIndicator(backgroundColor: Colors.black),
                 ),
               );
             }
@@ -305,7 +308,8 @@ class BodyPanel extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Center(
-                  child: CircularProgressIndicator( backgroundColor: Colors.black ),
+                  child:
+                      CircularProgressIndicator(backgroundColor: Colors.black),
                 ),
               );
             }
@@ -318,14 +322,17 @@ class BodyPanel extends StatelessWidget {
   Widget buildMenu(List<Menu> lista) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [ 
-        Text("Menu", style: TextStyle(fontWeight: FontWeight.bold),)
+      children: [
+        Text(
+          "Menu",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )
       ]..addAll(lista.map(_buildMenu).toList()),
     );
   }
 
   Widget _buildMenu(Menu menu) {
-  return new ListTile(
+    return new ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
       title: Row(
@@ -335,50 +342,59 @@ class BodyPanel extends StatelessWidget {
           Text('\$${menu.price}'),
         ],
       ),
-      subtitle: new Text('Ingrediente: ${menu.ingredients}' , overflow: TextOverflow.ellipsis,),
+      subtitle: new Text(
+        'Ingrediente: ${menu.ingredients}',
+        overflow: TextOverflow.ellipsis,
+      ),
       leading: new Icon(Icons.fastfood),
-  );
-}
+    );
+  }
 
   Widget buildRating(List<Rating> lista) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [ 
-        Text("Comentarios", style: TextStyle(fontWeight: FontWeight.bold),)
+      children: [
+        Text(
+          "Comentarios",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )
       ]..addAll(lista.map(_buildRating).toList()),
     );
   }
 
   Widget _buildRating(Rating rating) {
     return new ListTile(
-        dense: true,
-        contentPadding: EdgeInsets.zero,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('${rating.username}'),
-            Row(
-              children: [
-                Text('${rating.stars}.0'),
-                Stack(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      color: Color(0xFFDFFF1A),
-                      size: 20,
-                    ),
-                    Icon(
-                      Icons.star_border,
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        subtitle: new Text('${rating.comentario}' , overflow: TextOverflow.ellipsis,),
-        leading: new Icon(Icons.comment),
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('${rating.username}'),
+          Row(
+            children: [
+              Text('${rating.stars}.0'),
+              Stack(
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: Color(0xFFDFFF1A),
+                    size: 20,
+                  ),
+                  Icon(
+                    Icons.star_border,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      subtitle: new Text(
+        '${rating.comentario}',
+        overflow: TextOverflow.ellipsis,
+      ),
+      leading: new Icon(Icons.comment),
     );
   }
 
@@ -427,20 +443,22 @@ class BodyPanel extends StatelessWidget {
   void _onRatingTap(
       BuildContext context, void Function(void Function()) setStarState) async {
     if (Session.instance.isAuthenticate) {
-      await Navigator.of(context).push(MaterialPageRoute(
+      bool res = await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => RatingView(
                 hueca: hueca,
               )));
       setStarState(() {});
+      if (res != null) this.onClose();
     } else {
       bool login = await Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => Login()));
       if (login ?? false) {
-        await Navigator.of(context).push(MaterialPageRoute(
+        bool res = await Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => RatingView(
                   hueca: hueca,
                 )));
         setStarState(() {});
+        if (res != null) this.onClose();
       }
     }
   }

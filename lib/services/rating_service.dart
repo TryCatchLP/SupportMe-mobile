@@ -5,11 +5,10 @@ import 'package:supportme/models/rating.dart';
 
 class RatingService {
   static Dio _dio = Dio(BaseOptions(
-      baseUrl: "http://localhost:8000/api",
-      contentType: "application/json",
-      headers: Session.instance.authorization));
+      baseUrl: "http://localhost:8000/api", contentType: "application/json"));
 
   static Future<Map<String, dynamic>> post(Rating rating) async {
+    _dio.options.headers = Session.instance.authorization;
     try {
       final response = await _dio.post("/ratings", data: rating.toJson());
       return response.data;
@@ -20,6 +19,7 @@ class RatingService {
   }
 
   static Future<Map<String, dynamic>> update(Rating rating) async {
+    _dio.options.headers = Session.instance.authorization;
     try {
       final response =
           await _dio.put("/ratings/${rating.id}", data: rating.toJson());
@@ -31,6 +31,7 @@ class RatingService {
   }
 
   static Future<Rating> getUserRatingHueca(Hueca hueca) async {
+    _dio.options.headers = Session.instance.authorization;
     try {
       final response = await _dio.get("/ratings/${hueca.id}");
       if (response.data != "") {
@@ -45,6 +46,7 @@ class RatingService {
   }
 
   static Future<List<Rating>> getUserRatings() async {
+    _dio.options.headers = Session.instance.authorization;
     try {
       final response = await _dio.get("/ratings");
       List<Rating> ratings = List<Rating>();
@@ -78,6 +80,7 @@ class RatingService {
   }
 
   static Future<bool> delete(Rating rating) async {
+    _dio.options.headers = Session.instance.authorization;
     try {
       await _dio.delete("/ratings/${rating.id}");
       return true;
